@@ -1,0 +1,161 @@
+*,
+*:before,
+*:after {
+  box-sizing: border-box;
+}
+html,
+body {
+  font-size: 100%;
+  font-family: Arial, Helvetica, sans-serif;
+  font-weight: normal;
+  font-style: normal;
+  line-height: 1.4;
+  background: #ecf0f1;
+  padding: 0;
+  margin: 0;
+}
+a {
+  color: #65bd77;
+  text-decoration: none;
+}
+h1,
+h2,
+h3,
+h4,
+h5,
+h6 {
+  font-family: Courgette, cursive;
+  font-weight: normal;
+}
+header {
+  height: 50px;
+  margin-bottom: 30px;
+  background: #2c3e50;
+}
+header .game-title {
+  margin: 0;
+  float: left;
+  font-size: 30px;
+  font-family: Courgette, cursive;
+  font-weight: normal;
+  line-height: 50px;
+}
+header .game-title a {
+  color: #ecf0f1;
+  padding: 0 15px;
+}
+nav {
+  float: right;
+}
+nav ul {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+nav li {
+  display: inline-block;
+}
+nav a {
+  display: inline-block;
+  padding-left: 15px;
+  padding-right: 15px;
+  line-height: 50px;
+  color: #bdc3c7;
+}
+nav a:hover,
+nav a.active {
+  color: #ecf0f1;
+}
+main.game {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+main.intro {
+  max-width: 1000px;
+  margin: 0 auto;
+  text-align: center;
+}
+#board {
+  padding: 0 30px;
+}
+#board table {
+  border-collapse: separate;
+  border-spacing: 10px;
+}
+#board td {
+  width: 25px;
+  height: 25px;
+  border: 1px solid #34495e;
+}
+#board .player1 {
+  background: #f1c40f;
+  border-color: #f1c40f;
+}
+#board .player2 {
+  background: #e74c3c;
+  border-color: #e74c3c;
+}
+#board .player3 {
+  background: #2980b9;
+  border-color: #2980b9;
+}
+#board .player44 {
+  background: #2ecc71;
+  border-color: #2ecc71;
+}
+.player-info label {
+  font-size: 80%;
+}
+.player-info .score-card {
+  width: 50px;
+  height: 50px;
+  margin-top: 5px;
+  margin-bottom: 15px;
+  font-size: 24px;
+  line-height: 50px;
+  color: #fff;
+  text-align: center;
+}
+.p1 .score-card {
+  background: #f1c40f;
+}
+.p2 .score-card {
+  background: #e74c3c;
+}
+.p3 .score-card {
+  background: #2980b9;
+}
+.p4 .score-card {
+  background: #2ecc71;
+}
+#player1 {
+  text-align: right;
+}
+#player1 .score-card {
+  margin-left: auto;
+}
+#player2 {
+  text-align: left;
+}
+.modal {
+  display: none;
+  width: 100%;
+  height: 100%;
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  margin: 0;
+  padding: 0;
+  background: rgba(0,0,0,0.5);
+}
+.modal .container {
+  width: 500px;
+  position: absolute;
+  top: 25%;
+  left: 50%;
+  margin-left: -250px;
+  background: #fff;
+}

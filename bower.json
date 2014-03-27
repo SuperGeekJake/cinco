@@ -1,0 +1,16 @@
+{
+  "name": "pente",
+  "private": true,
+  "ignore": [
+    "**/.*",
+    "node_modules",
+    "bower_components",
+    "test",
+    "tests"
+  ],
+  "dependencies": {
+    "jQuery": "~2.1.0",
+    "underscore": "~1.6.0",
+    "normalize.css": "~3.0.0"
+  }
+}

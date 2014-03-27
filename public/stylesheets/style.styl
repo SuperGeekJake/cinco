@@ -1,0 +1,184 @@
+// Colors
+turquoise = #1abc9c;
+green_sea = #16a085;
+
+emerald = #2ecc71;
+nephritis = #27ae60;
+
+peter_river = #3498db;
+belize_hole = #2980b9;
+
+amethyst = #9b59b6;
+wisteria = #8e44ad;
+
+wet_asphalt = #34495e;
+midnight_blue = #2c3e50;
+
+sun_flower = #f1c40f;
+orange = #f39c12;
+
+carrot = #e67e22;
+pumpkin = #d35400;
+
+alizarin = #e74c3c;
+pomegranate = #c0392b;
+
+clouds = #ecf0f1;
+silver = #bdc3c7;
+
+concrete = #95a5a6;
+asbestos = #7f8c8d;
+
+
+p1_color = sun_flower
+p2_color = alizarin
+p3_color = belize_hole
+p4_color = emerald
+
+grid_size = 25px
+grid_spacing = 10px
+
+header_height = 50px
+header_bg = midnight_blue
+
+score_size = 50px
+
+courgette = Courgette, cursive
+
+*, *:before, *:after
+	box-sizing border-box
+
+html, body
+	font-size 100%
+	font-family Arial, Helvetica, sans-serif
+	font-weight normal
+	font-style normal
+	line-height 1.4
+	background clouds
+	padding: 0;
+	margin: 0;
+
+a
+	color #65BD77
+	text-decoration none
+
+h1, h2, h3, h4, h5, h6
+	font-family courgette
+	font-weight normal
+
+header
+	height header_height
+	margin-bottom 30px
+	background header_bg
+	.game-title
+		margin 0
+		float left
+		font-size 30px
+		font-family courgette
+		font-weight normal
+		line-height header_height
+		a
+			color clouds
+			padding 0 15px
+
+nav
+	float right
+	ul
+		margin 0
+		padding 0
+		list-style none
+	li
+		display inline-block
+	a
+		display inline-block
+		padding-left 15px
+		padding-right 15px
+		line-height header_height
+		color silver
+		&:hover, &.active
+			color clouds
+
+main.game
+	display flex
+	justify-content center
+	align-items center
+
+main.intro
+	max-width 1000px
+	margin 0 auto
+	text-align center
+
+#board
+	padding 0 30px
+	table
+		border-collapse separate
+		border-spacing grid_spacing
+	td
+		width grid_size
+		height grid_size
+		border 1px solid wet_asphalt
+	.player1
+		background p1_color
+		border-color p1_color
+	.player2
+		background p2_color
+		border-color p2_color
+	.player3
+		background p3_color
+		border-color p3_color
+	.player44
+		background p4_color
+		border-color p4_color
+
+.player-info
+	label
+		font-size 80%
+	.score-card
+		width score_size
+		height score_size
+		margin-top 5px
+		margin-bottom 15px
+		font-size 24px
+		line-height score_size
+		color white
+		text-align center
+
+.p1 .score-card
+	background p1_color
+
+.p2 .score-card
+	background p2_color
+
+.p3 .score-card
+	background p3_color
+
+.p4 .score-card
+	background p4_color
+
+#player1
+	text-align right
+	.score-card
+		margin-left auto
+
+#player2
+	text-align left
+
+.modal
+	display none
+	width 100%
+	height 100%
+	position fixed
+	top 0
+	left 0
+	right 0
+	bottom 0
+	margin 0
+	padding 0
+	background rgba(black, 0.5)
+	.container
+		width 500px
+		position absolute
+		top 25%
+		left 50%
+		margin-left -250px
+		background white
