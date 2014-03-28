@@ -16,21 +16,13 @@ module.exports = Pente;
  * @param {Object} options
  * @api private
  */
-function Pente(options) {
-	options = options || {};
-	this.gametype = options.gametype || "versus";
-	this.player1 = options.p1Socket;
-
-	var haystack = 'abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789';
-	var id = '';
-	var length = 6;
-
-	for (var i = 0; i < length; i++) {
-        id += haystack.charAt(Math.floor(Math.random() * 62));
-    }
-
-    this.ID = id;
+function Pente(ID, players) {
+    this.ID = ID;
+    this.players = players || [];
+    
+    // A board space can be either 0 (unclaimed) or 1 - 4 (players)
     this.board = [
+    	// columns 1 - 9
 		[0, 0, 0, 0, 0, 0, 0, 0, 0], // row 1
 		[0, 0, 0, 0, 0, 0, 0, 0, 0], // row 2
 		[0, 0, 0, 0, 0, 0, 0, 0, 0], // row 3
@@ -41,4 +33,23 @@ function Pente(options) {
 		[0, 0, 0, 0, 0, 0, 0, 0, 0], // row 8
 		[0, 0, 0, 0, 0, 0, 0, 0, 0]  // row 9
     ];
+}
+
+Pente.prototype.runGame = function () {
+	// Set player 1 to play first
+	var current = 0;
+	// Set up victory variables
+	var p1Victory = false;
+	var p2Victory = false;
+
+	do {
+		// Tell player to make his move
+		// Recieve move and verify
+		// Check for 4-in-a-rows, captures, and victory.
+		// Broadcast board, score, and victory updates.
+	} while (!p1Victory || !p2Victory); // No one has won
+}
+
+Pente.prototype.checkVictory = function (pid) {
+
 }

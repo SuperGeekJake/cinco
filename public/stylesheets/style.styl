@@ -81,32 +81,10 @@ header
 			color clouds
 			padding 0 15px
 
-nav
-	float right
-	ul
-		margin 0
-		padding 0
-		list-style none
-	li
-		display inline-block
-	a
-		display inline-block
-		padding-left 15px
-		padding-right 15px
-		line-height header_height
-		color silver
-		&:hover, &.active
-			color clouds
-
-main.game
+main
 	display flex
 	justify-content center
 	align-items center
-
-main.intro
-	max-width 1000px
-	margin 0 auto
-	text-align center
 
 #board
 	padding 0 30px
@@ -131,13 +109,23 @@ main.intro
 		border-color p4_color
 
 .player-info
+	width 100px
+	padding 10px
+	text-align center
+	opacity 0.5
+	&.active
+		opacity 1
+	&.current
+		background white
 	label
 		font-size 80%
 	.score-card
 		width score_size
 		height score_size
 		margin-top 5px
+		margin-left auto
 		margin-bottom 15px
+		margin-right auto
 		font-size 24px
 		line-height score_size
 		color white
@@ -148,37 +136,3 @@ main.intro
 
 .p2 .score-card
 	background p2_color
-
-.p3 .score-card
-	background p3_color
-
-.p4 .score-card
-	background p4_color
-
-#player1
-	text-align right
-	.score-card
-		margin-left auto
-
-#player2
-	text-align left
-
-.modal
-	display none
-	width 100%
-	height 100%
-	position fixed
-	top 0
-	left 0
-	right 0
-	bottom 0
-	margin 0
-	padding 0
-	background rgba(black, 0.5)
-	.container
-		width 500px
-		position absolute
-		top 25%
-		left 50%
-		margin-left -250px
-		background white

@@ -1,4 +1,6 @@
-// Express
+/* Libraries
+   ========================================================================== */
+
 var express = require('express');
 var http = require('http');
 var path = require('path');
@@ -7,22 +9,25 @@ var logger = require('morgan');
 var cookieParser = require('cookie-parser');
 var bodyParser = require('body-parser');
 var debug = require('debug')('pente');
-
-// Socket.io
 var io = require('socket.io');
-
-var routes = require('./routes');
-var users = require('./routes/user');
+var Pente = require('./pente');
+var _ = require('underscore');
 
 var app = express();
+var games = {};
 
-//
-var Pente = require('./pente');
 
-// view engine setup
+/* App Variables
+   ========================================================================== */
+
 app.set('port', process.env.PORT || 3000);
 app.set('views', path.join(__dirname, 'views'));
 app.set('view engine', 'jade');
+app.set('title', 'Pente');
+
+
+/* Settings
+   ========================================================================== */
 
 app.use(favicon());
 app.use(logger('dev'));
@@ -34,59 +39,124 @@ app.use(express.static(path.join(__dirname, 'public')));
 app.use(express.static(path.join(__dirname, 'bower_components')));
 app.use(app.router);
 
-app.get('/', routes.index);
-
-app.get('/game/:gametype', routes.game);
-app.get('/game/:id([A-Za-z0-9]{6})', routes.join);
-
-app.get('/quit', function (req, res) {
-    res.redirect('/');
-});
-
-// app.get('/users', users.list);
-
-/// catch 404 and forwarding to error handler
-app.use(function(req, res, next) {
-    var err = new Error('Not Found');
-    err.status = 404;
-    next(err);
-});
-
-/// error handlers
+/* Error Handlers */
 
 // development error handler
 // will print stacktrace
 if ( app.get('env') === 'development' ) {
-    app.use(function(err, req, res, next) {
-        res.render('error', {
-            message: err.message,
-            error: err
-        });
-    });
+	app.use(function(err, req, res, next) {
+		res.render('error', {
+			message: err.message,
+			error: err
+		});
+	});
 }
 
 // production error handler
 // no stacktraces leaked to user
 app.use(function(err, req, res, next) {
-    res.render('error', {
-        message: err.message,
-        error: {}
-    });
+	res.render('error', {
+		message: err.message,
+		error: {}
+	});
 });
 
+/// catch 404 and forwarding to error handler
+app.use(function(req, res, next) {
+	var err = new Error('Not Found');
+	err.status = 404;
+	next(err);
+});
+
+
+/* Functions
+   ========================================================================== */
+
+function generateID(length) {
+	var haystack = 'abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789';
+	var ID = '';
+	do {
+		for(var i = 0; i < length; i++) {
+			ID += haystack.charAt(Math.floor(Math.random() * 62));
+		}
+	} while (ID === games.ID);
+
+	return ID;
+};
+
+
+/* Routes
+   ========================================================================== */
+
+app.get('/', function (req, res) {
+	var gameID = generateID(6);
+	res.redirect(gameID);
+});
+
+app.get('/:ID([A-Za-z0-9]{6})', function (req, res) {
+	res.render('index', {
+		title: app.get('title'),
+		game: true,
+		ID: req.params.ID
+	});
+});
+
+app.get('/quit', function (req, res) {
+	res.redirect('/');
+});
+
+
+/* Run App
+   ========================================================================== */
+
 var server = io.listen(app.listen(app.get('port'), function() {
-  debug('Express server listening on port ' + app.get('port'));
+	debug('Express server listening on port ' + app.get('port'));
 }));
 
-// var options = {
-//     p1Socket: 51574,
-//     gametype: "teams"
-// };
 
-// var game01 = new Pente(options);
-// console.log(game01);
+/* Sockets
+   ========================================================================== */
 
 server.set('log level', 2);
-// server.sockets.on('connection', function (socket) {
-//   console.log("New Player has joined the server.");
-// });
+
+server.sockets.on('connection', function (socket) {
+	socket.on('join', function (data) {
+		socket.game = data;
+		// If game is already created
+		if (games[socket.game]) {
+			var game = games[socket.game];
+
+			// If there's a spot open, add you as a player
+			if (game.players.length == 1) {
+				game.players.push(socket);
+				socket.pid = 1;
+				socket.broadcast.to(socket.game).emit('start');
+				debug('Game found. You are Player 2.');
+			} else {
+				socket.pid = -1;
+				debug('Game found. You are Observer.');
+			}
+
+		} else {
+			var game = new Pente(socket.game, [socket]);
+			games[socket.game] = game;
+			socket.pid = 0;
+			debug('Game created. You are Player 1.');
+		}
+
+		// Join game room whether as a player or observer
+		socket.join(socket.game);
+		socket.emit('assign', socket.pid);
+	});
+
+	socket.on('disconnect', function () {
+		if (socket.pid != -1) {
+			delete games[socket.game];
+			socket.broadcast.to(socket.game).emit('forfeit', socket.pid);
+			debug('Game deleted.');
+			debug('Player has left game.');
+		} else {
+			debug('Observer has left game.');
+		}
+	});
+});
