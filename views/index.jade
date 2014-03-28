@@ -1,0 +1,34 @@
+doctype html
+html
+	head
+		title= title
+		link(rel='stylesheet', href='//fonts.googleapis.com/css?family=Courgette')
+		link(rel='stylesheet', href='/normalize.css/normalize.css')
+		link(rel='stylesheet', href='/stylesheets/style.css')
+	body
+		header
+			h2.game-title
+				a(href='/')= title
+			div.notify
+
+		main
+			div#player1.player-info.p1
+				h3 Player 1
+				label Rows
+				p#p1-rows.score-card 0
+				label Captures
+				p#pl-captures.score-card 0
+			div#board
+				table
+			div#player2.player-info.p2
+				h3 Player 2
+				label Rows
+				p#p2-rows.score-card 0
+				label Captures
+				p#p2-captures.score-card 0
+
+		// Scripts
+		script(src='/underscore/underscore.js')
+		script(src='/jQuery/dist/jquery.min.js')
+		script(src='/socket.io/socket.io.js')
+		script(src='/javascripts/main.js')
