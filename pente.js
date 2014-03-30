@@ -5,51 +5,74 @@ module.exports = Pente;
 
 /**
  * Initialize a new `Pente` game with the given `options`.
- *
- * Options:
- *
- *   - `defaultEngine` the default template engine name
- *   - `engines` template engine require() cache
- *   - `root` root path for view lookup
- *
- * @param {String} name
- * @param {Object} options
- * @api private
+ * @param {String} ID
+ * @param {Array} players
  */
 function Pente(ID, players) {
-    this.ID = ID;
-    this.players = players || [];
-    
-    // A board space can be either 0 (unclaimed) or 1 - 4 (players)
-    this.board = [
-    	// columns 1 - 9
-		[0, 0, 0, 0, 0, 0, 0, 0, 0], // row 1
-		[0, 0, 0, 0, 0, 0, 0, 0, 0], // row 2
-		[0, 0, 0, 0, 0, 0, 0, 0, 0], // row 3
-		[0, 0, 0, 0, 0, 0, 0, 0, 0], // row 4
-		[0, 0, 0, 0, 0, 0, 0, 0, 0], // row 5
-		[0, 0, 0, 0, 0, 0, 0, 0, 0], // row 6
-		[0, 0, 0, 0, 0, 0, 0, 0, 0], // row 7
-		[0, 0, 0, 0, 0, 0, 0, 0, 0], // row 8
-		[0, 0, 0, 0, 0, 0, 0, 0, 0]  // row 9
-    ];
+	this.ID = ID;
+	this.players = players || [];
+	this.turn = 1;
+	this.captures = [0,0];
+	
+	// A board space can be either 0 (unclaimed) or 1 - 2 (players)
+	this.board = [
+		// columns 1 - 19
+		[0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0], // row 01
+		[0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0], // row 02
+		[0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0], // row 03
+		[0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0], // row 04
+		[0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0], // row 05
+		[0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0], // row 06
+		[0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0], // row 07
+		[0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0], // row 08
+		[0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0], // row 09
+		[0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0], // row 10
+		[0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0], // row 11
+		[0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0], // row 12
+		[0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0], // row 13
+		[0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0], // row 14
+		[0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0], // row 15
+		[0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0], // row 16
+		[0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0], // row 17
+		[0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0], // row 18
+		[0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0]  // row 19
+	];
 }
 
-Pente.prototype.runGame = function () {
-	// Set player 1 to play first
-	var current = 0;
-	// Set up victory variables
-	var p1Victory = false;
-	var p2Victory = false;
+// COPIED FROM CONNECT 4, MAY NEED TWEAKING
+Pente.prototype.getPairs = function (row, column, step) {
+	l = [];
 
-	do {
-		// Tell player to make his move
-		// Recieve move and verify
-		// Check for 4-in-a-rows, captures, and victory.
-		// Broadcast board, score, and victory updates.
-	} while (!p1Victory || !p2Victory); // No one has won
-}
+	for (var i = 0; i < 5; i++) {
+		l.push([row, column]);
+		row += step[0];
+		column += step[1];
+	}
 
-Pente.prototype.checkVictory = function (pid) {
+	return l;
+};
 
-}
+// COPIED FROM CONNECT 4, WILL NEED TWEAKING
+Pente.prototype.checkHorizontal = function (row, startColumn, callback) {
+	for (var i = 1; i < 19; i++) {
+		var count = 0;
+		var column = startColumn + 1 - i;
+		var columnEnd = startColumn + 5 - i;
+
+		if (columnEnd > 17 || column < 0) {
+			continue;
+		}
+
+		var pairs = getPairs(row, column, [0,1]);
+
+		for (var j = column; j < columnEnd + 1; j++) {
+			count += games[room]['board'][row][j];
+		}
+
+		if (count == 5) {
+			callback(1, pairs);
+		} else if (count == -5) {
+			callback(2, pairs);
+		}
+	}
+};

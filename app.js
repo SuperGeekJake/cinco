@@ -121,7 +121,10 @@ server.set('log level', 2);
 
 server.sockets.on('connection', function (socket) {
 	socket.on('join', function (data) {
+		// Setup Game ID
 		socket.game = data;
+		// Join game room whether as a player or observer
+		socket.join(socket.game);
 		// If game is already created
 		if (games[socket.game]) {
 			var game = games[socket.game];
@@ -129,34 +132,59 @@ server.sockets.on('connection', function (socket) {
 			// If there's a spot open, add you as a player
 			if (game.players.length == 1) {
 				game.players.push(socket);
-				socket.pid = 1;
+				socket.pid = 2;
+				socket.emit('assign', socket.pid);
+				// Notify room of second player
 				socket.broadcast.to(socket.game).emit('start');
-				debug('Game found. You are Player 2.');
+				// Send turn request
+				server.sockets.to(socket.game).emit('notify', {
+					board: game['board'],
+					turn: game['turn']
+				});
 			} else {
-				socket.pid = -1;
-				debug('Game found. You are Observer.');
+				socket.pid = 0;
+				socket.emit('assign', socket.pid);
 			}
 
 		} else {
 			var game = new Pente(socket.game, [socket]);
 			games[socket.game] = game;
-			socket.pid = 0;
-			debug('Game created. You are Player 1.');
+			socket.pid = 1;
+			socket.emit('assign', socket.pid);
 		}
-
-		// Join game room whether as a player or observer
-		socket.join(socket.game);
-		socket.emit('assign', socket.pid);
 	});
 
 	socket.on('disconnect', function () {
-		if (socket.pid != -1) {
+		if (socket.pid != 0) {
 			delete games[socket.game];
 			socket.broadcast.to(socket.game).emit('forfeit', socket.pid);
-			debug('Game deleted.');
-			debug('Player has left game.');
-		} else {
-			debug('Observer has left game.');
+		}
+	});
+
+	// Player has made move
+	socket.on('turn', function (data) {
+		var game = games[socket.game];
+
+		// Accept turn if player's turn
+		if (game['turn'] == socket.pid) {
+			// Process player's move
+			
+			// Update board
+			game['board'][data.row][data.column] = socket.pid;
+
+			// Check for Victory
+			if (false) {
+				// Delete game and notify room of player's victory
+			} else {
+				// Change player turn
+				game['turn'] = (game['turn'] == 1) ? 2 : 1;
+				// Send board update
+				server.sockets.to(socket.game).emit('notify', {
+					board: game['board'],
+					// game['scores'],
+					turn: game['turn']
+				});
+			}
 		}
 	});
 });

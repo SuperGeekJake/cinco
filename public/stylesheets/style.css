@@ -56,24 +56,27 @@ main {
   border-collapse: separate;
   border-spacing: 10px;
 }
+#board table.active td {
+  cursor: pointer;
+}
 #board td {
   width: 25px;
   height: 25px;
   border: 1px solid #34495e;
 }
-#board .player1 {
+#board .p1 {
   background: #f1c40f;
   border-color: #f1c40f;
 }
-#board .player2 {
+#board .p2 {
   background: #e74c3c;
   border-color: #e74c3c;
 }
-#board .player3 {
+#board .p3 {
   background: #2980b9;
   border-color: #2980b9;
 }
-#board .player44 {
+#board .p4 {
   background: #2ecc71;
   border-color: #2ecc71;
 }
