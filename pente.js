@@ -39,40 +39,107 @@ function Pente(ID, players) {
 	];
 }
 
-// COPIED FROM CONNECT 4, MAY NEED TWEAKING
-Pente.prototype.getPairs = function (row, column, step) {
-	l = [];
-
-	for (var i = 0; i < 5; i++) {
-		l.push([row, column]);
-		row += step[0];
-		column += step[1];
+Pente.prototype.checkVictory = function () {
+	for (var row = 0; row < 19; row++) {
+		for (var column = 0; column < 19; column++) {
+			if (this.board[row][column] == this.turn) {
+				if (this.checkHorizontal([row,column])) return true;
+				if (this.checkVertical([row,column])) return true;
+				if (this.checkLeftDiagonal([row,column])) return true;
+				if (this.checkRightDiagonal([row,column])) return true;
+			}
+		}
 	}
 
-	return l;
+	return false;
+}
+
+Pente.prototype.checkHorizontal = function (startPoint) {
+	// Info: startPoint = [row, column]
+
+	var columnEnd = startPoint[1] + 4; //total of 5 spaces
+	// Are there not enough spaces to the right to make Pente?
+	if (columnEnd > 19) {
+		return false;
+	}
+
+	var row = startPoint[0];
+	var columnStart = startPoint[1];
+
+	// Check the next 4 spaces
+	for (var i = 1; i < 5; i++) {
+		if (this.board[row][columnStart + i] != this.turn) {
+			return false;
+		}
+	}
+
+	return true;
 };
 
-// COPIED FROM CONNECT 4, WILL NEED TWEAKING
-Pente.prototype.checkHorizontal = function (row, startColumn, callback) {
-	for (var i = 1; i < 19; i++) {
-		var count = 0;
-		var column = startColumn + 1 - i;
-		var columnEnd = startColumn + 5 - i;
+Pente.prototype.checkVertical = function (startPoint) {
+	// Info: startPoint = [row, column]
 
-		if (columnEnd > 17 || column < 0) {
-			continue;
-		}
+	var rowEnd = startPoint[0] + 4; //total of 5 spaces
+	// Are there not enough spaces to the right to make Pente?
+	if (rowEnd > 19) {
+		return false;
+	}
 
-		var pairs = getPairs(row, column, [0,1]);
+	var rowStart = startPoint[0];
+	var column = startPoint[1];
 
-		for (var j = column; j < columnEnd + 1; j++) {
-			count += games[room]['board'][row][j];
-		}
-
-		if (count == 5) {
-			callback(1, pairs);
-		} else if (count == -5) {
-			callback(2, pairs);
+	// Check the next 4 spaces
+	for (var i = 1; i < 5; i++) {
+		if (this.board[rowStart + i][column] != this.turn) {
+			return false;
 		}
 	}
+
+	return true;
+};
+
+Pente.prototype.checkLeftDiagonal = function (startPoint) {
+	// Info: startPoint = [row, column]
+	
+	var rowStart = startPoint[0];
+	var columnStart = startPoint[1];
+
+	var rowEnd = startPoint[0] + 4; //total of 5 spaces
+	var columnEnd = startPoint[1] + 4; //total of 5 spaces
+	// Are there not enough spaces to the right to make Pente?
+	if (rowEnd > 19 || columnEnd > 19) {
+		return false;
+	}
+
+	// Check the next 4 spaces
+	for (var i = 1; i < 5; i++) {
+		if (this.board[rowStart + i][columnStart + i] != this.turn) {
+			return false;
+		}
+	}
+
+	return true;
+};
+
+Pente.prototype.checkRightDiagonal = function (startPoint) {
+	// Info: startPoint = [row, column]
+	
+	var rowStart = startPoint[0];
+	var columnStart = startPoint[1];
+
+	var rowEnd = startPoint[0] - 4; //total of 5 spaces
+	var columnEnd = startPoint[1] + 4; //total of 5 spaces
+	// Are there not enough spaces to the right to make Pente?
+	if (rowEnd < 0 || columnEnd > 19) {
+		return false;
+	}
+
+	// Check the next 4 spaces
+	for (var i = 1; i < 5; i++) {
+		if (this.board[rowStart - i][columnStart + i] != this.turn) {
+			return false;
+		}
+	}
+
+	return true;
 };

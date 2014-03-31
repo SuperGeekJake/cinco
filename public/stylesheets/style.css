@@ -59,24 +59,30 @@ main {
 #board table.active td {
   cursor: pointer;
 }
-#board td {
+#board table td {
   width: 25px;
   height: 25px;
   border: 1px solid #34495e;
 }
-#board .p1 {
+#board table td.active {
+  cursor: default;
+}
+#board table td.victory {
+  border-color: #3498db;
+}
+#board table .p1 {
   background: #f1c40f;
   border-color: #f1c40f;
 }
-#board .p2 {
+#board table .p2 {
   background: #e74c3c;
   border-color: #e74c3c;
 }
-#board .p3 {
+#board table .p3 {
   background: #2980b9;
   border-color: #2980b9;
 }
-#board .p4 {
+#board table .p4 {
   background: #2ecc71;
   border-color: #2ecc71;
 }

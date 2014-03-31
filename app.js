@@ -139,6 +139,7 @@ server.sockets.on('connection', function (socket) {
 				// Send turn request
 				server.sockets.to(socket.game).emit('notify', {
 					board: game['board'],
+					captures: game['captures'],
 					turn: game['turn']
 				});
 			} else {
@@ -165,23 +166,37 @@ server.sockets.on('connection', function (socket) {
 	socket.on('turn', function (data) {
 		var game = games[socket.game];
 
-		// Accept turn if player's turn
+		// Check if player's turn
 		if (game['turn'] == socket.pid) {
-			// Process player's move
-			
-			// Update board
-			game['board'][data.row][data.column] = socket.pid;
+			// Check if move is illegal
+			if (game['board'][data.row][data.column] == 0) {
+				// Update board
+				game['board'][data.row][data.column] = socket.pid;
 
-			// Check for Victory
-			if (false) {
-				// Delete game and notify room of player's victory
+				// Check for Victory
+				if (game.checkVictory()) {
+					// Delete game and notify room of player's victory
+					delete games[socket.game];
+					server.sockets.to(socket.game).emit('victory', {
+						board: game['board'],
+						captures: game['captures'],
+						victor: game['turn']
+					});
+				} else {
+					// Change player turn
+					game['turn'] = (game['turn'] == 1) ? 2 : 1;
+					// Send game update
+					server.sockets.to(socket.game).emit('notify', {
+						board: game['board'],
+						captures: game['captures'],
+						turn: game['turn']
+					});
+				}
 			} else {
-				// Change player turn
-				game['turn'] = (game['turn'] == 1) ? 2 : 1;
-				// Send board update
+				// Notify the user to try again
 				server.sockets.to(socket.game).emit('notify', {
 					board: game['board'],
-					// game['scores'],
+					captures: game['captures'],
 					turn: game['turn']
 				});
 			}

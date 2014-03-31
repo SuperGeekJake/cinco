@@ -47,11 +47,27 @@ socket.on('assign', function (data) {
 	}
 });
 
-socket.on('start', function (data) {
+/**
+ * Sent to everyone except Player 2 to notify of Player 2 joining
+ */
+socket.on('start', function () {
 	$('#player2').addClass('active');
+	console.log('Player 2 has joined. Game is ready.');
+	// Notify players game is ready for play.
 });
 
+/**
+ * Processes game update from server
+ * @param {Object} data Contains the baord, turn, and captures.
+ */
 socket.on('notify', function (data) {
+	// Display whose turn it is
+	var notTurn = (data.turn == 1) ? 2 : 1;
+	$('#player' + notTurn).removeClass('current');
+	$('#player' + data.turn).addClass('current');
+
+
+	// If player's turn, active the board
 	if (data.turn == playerID) {
 		turn = true;
 		$('#board table').addClass('active');
@@ -63,18 +79,24 @@ socket.on('notify', function (data) {
 			if (data.board[i][j] != board[i][j]) {
 				var target = $('#board td[data-row="' + i + '"][data-column="' + j + '"]');
 				target.removeClass();
-				target.addClass('p' + data.board[i][j]);
+				target.addClass('active p' + data.board[i][j]);
 			}
 		}
 	}
 
 	// Save updated board
 	board = data.board;
+
+	// Update capture scores
+	$('#p1-captures').text(data.captures[0]);
+	$('#p2-captures').text(data.captures[1]);
 });
 
 socket.on('forfeit', function (data) {
-	var player = data + 1;
+	var player = data;
+	$('.player-info').removeClass('current');
 	$('#player' + player).removeClass('active');
+	$('#board td').removeClass();
 	console.log('[NOTICE] Game over. Player ' + player + ' has forfeit.');
 });
 
@@ -94,7 +116,7 @@ for(var i = 0; i < 19; i++){
 
 // Get board clicks
 $('#board td').click(function () {
-	if (turn) {
+	if (turn && !$(this).hasClass('active')) {
 		turn = false;
 		$('#board table').removeClass('active');
 

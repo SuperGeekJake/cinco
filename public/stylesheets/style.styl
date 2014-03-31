@@ -93,22 +93,27 @@ main
 		border-spacing grid_spacing
 		&.active td
 			cursor pointer
-	td
-		width grid_size
-		height grid_size
-		border 1px solid wet_asphalt
-	.p1
-		background p1_color
-		border-color p1_color
-	.p2
-		background p2_color
-		border-color p2_color
-	.p3
-		background p3_color
-		border-color p3_color
-	.p4
-		background p4_color
-		border-color p4_color
+		td
+			width grid_size
+			height grid_size
+			border 1px solid wet_asphalt
+			&.active
+				cursor default
+			&.victory
+				border-color belize_hole
+				border-width 2px
+		.p1
+			background p1_color
+			border-color p1_color
+		.p2
+			background p2_color
+			border-color p2_color
+		.p3
+			background p3_color
+			border-color p3_color
+		.p4
+			background p4_color
+			border-color p4_color
 
 .player-info
 	width 100px
