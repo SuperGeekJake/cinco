@@ -1,4 +1,4 @@
-var socket = io.connect('76.126.0.21');
+var socket = io.connect(location.host);
 
 var gameURI = location.pathname;
 var gameID = gameURI.substr(1);
@@ -121,9 +121,8 @@ socket.on('victory', function (data) {
 	$('#pl-captures').text(data.captures[0]);
 	$('#p2-captures').text(data.captures[1]);
 
-	alert('Player ' + data.victor + ' is victor!');
-
 	// Task: Ask players for rematch
+	alert('Player ' + data.victor + ' is victor!');
 });
 
 socket.on('forfeit', function (data) {
@@ -131,9 +130,7 @@ socket.on('forfeit', function (data) {
 	$('#player' + data).removeClass('active');
 	$('#board td').removeClass();
 	var playAgain = confirm('Game over. Player ' + data + ' has forfeit. Play Again?');
-	if (playAgain) {
-		location.reload();
-	}
+	if (playAgain) location.reload();
 });
 
 // Get board clicks
