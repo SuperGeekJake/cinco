@@ -1,9 +1,9 @@
 {
-  "name": "pente",
-  "version": "0.0.1",
+  "name": "cinco",
+  "version": "1.0.0",
   "private": true,
   "scripts": {
-    "start": "DEBUG=pente node app.js"
+    "start": "DEBUG=cinco node app.js"
   },
   "dependencies": {
     "express": "~3.4.8",

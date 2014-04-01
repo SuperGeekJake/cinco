@@ -1,14 +1,14 @@
 /**
- * Expose `Pente`.
+ * Expose `Cinco`.
  */
-module.exports = Pente;
+module.exports = Cinco;
 
 /**
- * Initialize a new `Pente` game with the given `options`.
+ * Initialize a new `Cinco` game with the given `options`.
  * @param {String} ID
  * @param {Array} players
  */
-function Pente(ID, players) {
+function Cinco(ID, players) {
 	this.ID = ID;
 	this.players = players || [];
 	this.turn = 1;
@@ -39,7 +39,7 @@ function Pente(ID, players) {
 	];
 }
 
-Pente.prototype.checkVictory = function () {
+Cinco.prototype.checkVictory = function () {
 	for (var row = 0; row < 19; row++) {
 		for (var column = 0; column < 19; column++) {
 			if (this.board[row][column] == this.turn) {
@@ -54,11 +54,11 @@ Pente.prototype.checkVictory = function () {
 	return false;
 }
 
-Pente.prototype.checkHorizontal = function (startPoint) {
+Cinco.prototype.checkHorizontal = function (startPoint) {
 	// Info: startPoint = [row, column]
 
 	var columnEnd = startPoint[1] + 4; //total of 5 spaces
-	// Are there not enough spaces to the right to make Pente?
+	// Are there not enough spaces to the right to make Cinco?
 	if (columnEnd > 19) {
 		return false;
 	}
@@ -76,11 +76,11 @@ Pente.prototype.checkHorizontal = function (startPoint) {
 	return true;
 };
 
-Pente.prototype.checkVertical = function (startPoint) {
+Cinco.prototype.checkVertical = function (startPoint) {
 	// Info: startPoint = [row, column]
 
 	var rowEnd = startPoint[0] + 4; //total of 5 spaces
-	// Are there not enough spaces to the right to make Pente?
+	// Are there not enough spaces to the right to make Cinco?
 	if (rowEnd > 19) {
 		return false;
 	}
@@ -98,7 +98,7 @@ Pente.prototype.checkVertical = function (startPoint) {
 	return true;
 };
 
-Pente.prototype.checkLeftDiagonal = function (startPoint) {
+Cinco.prototype.checkLeftDiagonal = function (startPoint) {
 	// Info: startPoint = [row, column]
 	
 	var rowStart = startPoint[0];
@@ -106,7 +106,7 @@ Pente.prototype.checkLeftDiagonal = function (startPoint) {
 
 	var rowEnd = startPoint[0] + 4; //total of 5 spaces
 	var columnEnd = startPoint[1] + 4; //total of 5 spaces
-	// Are there not enough spaces to the right to make Pente?
+	// Are there not enough spaces to the right to make Cinco?
 	if (rowEnd > 19 || columnEnd > 19) {
 		return false;
 	}
@@ -121,7 +121,7 @@ Pente.prototype.checkLeftDiagonal = function (startPoint) {
 	return true;
 };
 
-Pente.prototype.checkRightDiagonal = function (startPoint) {
+Cinco.prototype.checkRightDiagonal = function (startPoint) {
 	// Info: startPoint = [row, column]
 	
 	var rowStart = startPoint[0];
@@ -129,7 +129,7 @@ Pente.prototype.checkRightDiagonal = function (startPoint) {
 
 	var rowEnd = startPoint[0] - 4; //total of 5 spaces
 	var columnEnd = startPoint[1] + 4; //total of 5 spaces
-	// Are there not enough spaces to the right to make Pente?
+	// Are there not enough spaces to the right to make Cinco?
 	if (rowEnd < 0 || columnEnd > 19) {
 		return false;
 	}
@@ -143,3 +143,116 @@ Pente.prototype.checkRightDiagonal = function (startPoint) {
 
 	return true;
 };
+
+Cinco.prototype.checkCaptures = function (position) {
+	var captures = 0;
+	var row = position[0];
+	var column = position[1];
+	var opponent = (this.turn == 1) ? 2 : 1;
+
+	// Check Top
+	if (row - 3 > -1) {
+		if (
+				this.board[row - 1][column] == opponent &&
+				this.board[row - 2][column] == opponent &&
+				this.board[row - 3][column] == this.turn
+			) {
+			captures++;
+			this.board[row - 1][column] = 0;
+			this.board[row - 2][column] = 0;
+		}
+	}
+
+	// Check Bottom
+	if (row + 3 < 19) {
+		if (
+				this.board[row + 1][column] == opponent &&
+				this.board[row + 2][column] == opponent &&
+				this.board[row + 3][column] == this.turn
+			) {
+			captures++;
+			this.board[row + 1][column] = 0;
+			this.board[row + 2][column] = 0;
+		}
+	}
+
+	// Check Left
+	if (column - 3 > -1) {
+		if (
+				this.board[row][column - 1] == opponent &&
+				this.board[row][column - 2] == opponent &&
+				this.board[row][column - 3] == this.turn
+			) {
+			captures++;
+			this.board[row][column - 1] = 0;
+			this.board[row][column - 2] = 0;
+		}
+	}
+
+	// Check Right
+	if (column + 3 < 19) {
+		if (
+				this.board[row][column + 1] == opponent &&
+				this.board[row][column + 2] == opponent &&
+				this.board[row][column + 3] == this.turn
+			) {
+			captures++;
+			this.board[row][column + 1] = 0;
+			this.board[row][column + 2] = 0;
+		}
+	}
+
+	// Check Top Left Diagonal
+	if (row - 3 > -1 && column - 3 > -1) {
+		if (
+				this.board[row - 1][column - 1] == opponent &&
+				this.board[row - 2][column - 2] == opponent &&
+				this.board[row - 3][column - 3] == this.turn
+			) {
+			captures++;
+			this.board[row - 1][column - 1] = 0;
+			this.board[row - 2][column - 2] = 0;
+		}
+	}
+
+	// Check Top Right Diagonal
+	if (row - 3 > -1 && column + 3 < 19) {
+		if (
+				this.board[row - 1][column + 1] == opponent &&
+				this.board[row - 2][column + 2] == opponent &&
+				this.board[row - 3][column + 3] == this.turn
+			) {
+			captures++;
+			this.board[row - 1][column + 1] = 0;
+			this.board[row - 2][column + 2] = 0;
+		}
+	}
+
+	// Check Bottom Left Diagonal
+	if (row + 3 < 19 && column - 3 > -1) {
+		if (
+				this.board[row + 1][column - 1] == opponent &&
+				this.board[row + 2][column - 2] == opponent &&
+				this.board[row + 3][column - 3] == this.turn
+			) {
+			captures++;
+			this.board[row + 1][column - 1] = 0;
+			this.board[row + 2][column - 2] = 0;
+		}
+	}
+
+	// Check Bottom Right Diagonal
+	if (row + 3 < 19 && column + 3 < 19) {
+		if (
+				this.board[row + 1][column + 1] == opponent &&
+				this.board[row + 2][column + 2] == opponent &&
+				this.board[row + 3][column + 3] == this.turn
+			) {
+			captures++;
+			this.board[row + 1][column + 1] = 0;
+			this.board[row + 2][column + 2] = 0;
+		}
+	}
+
+	return captures;
+}

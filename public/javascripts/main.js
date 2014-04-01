@@ -1,6 +1,6 @@
-var socket = io.connect('jakedev');
+var socket = io.connect('76.126.0.21');
 
-var gameURI = window.location.pathname;
+var gameURI = location.pathname;
 var gameID = gameURI.substr(1);
 var playerID;
 var turn = false;
@@ -27,6 +27,16 @@ var board = [
 	[0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0]  // row 19
 ];
 
+// Create game board
+for(var i = 0; i < 19; i++){
+	$('#board table').append('<tr></tr>');
+
+	for(var j = 0; j < 19; j++) {
+		$('#board tr').last().append('<td></td>');
+		$('#board td').last().attr('data-row', i).attr('data-column', j);
+	}
+}
+
 socket.on('connect', function () {
 	socket.emit('join', gameID);
 });
@@ -35,15 +45,13 @@ socket.on('assign', function (data) {
 	playerID = data;
 	if (playerID == 1) {
 		$('#player1').addClass('active');
-		console.log('[NOTICE] Game created. You are Player 1.');
 	} else if (playerID == 2) {
 		$('#player1').addClass('active');
 		$('#player2').addClass('active');
-		console.log('[NOTICE] Game joined. You are Player 2.');
+		alert('Game is ready!');
 	} else {
 		$('#player1').addClass('active');
 		$('#player2').addClass('active');
-		console.log('[NOTICE] Join failed. Game is full.');
 	}
 });
 
@@ -52,8 +60,7 @@ socket.on('assign', function (data) {
  */
 socket.on('start', function () {
 	$('#player2').addClass('active');
-	console.log('Player 2 has joined. Game is ready.');
-	// Notify players game is ready for play.
+	alert('Player 2 has joined. Game is ready!');
 });
 
 /**
@@ -79,7 +86,9 @@ socket.on('notify', function (data) {
 			if (data.board[i][j] != board[i][j]) {
 				var target = $('#board td[data-row="' + i + '"][data-column="' + j + '"]');
 				target.removeClass();
-				target.addClass('active p' + data.board[i][j]);
+				if (data.board[i][j] != 0) {
+					target.addClass('active p' + data.board[i][j]);
+				}
 			}
 		}
 	}
@@ -88,31 +97,44 @@ socket.on('notify', function (data) {
 	board = data.board;
 
 	// Update capture scores
-	$('#p1-captures').text(data.captures[0]);
+	$('#pl-captures').text(data.captures[0]);
 	$('#p2-captures').text(data.captures[1]);
 });
 
-socket.on('forfeit', function (data) {
-	var player = data;
-	$('.player-info').removeClass('current');
-	$('#player' + player).removeClass('active');
-	$('#board td').removeClass();
-	console.log('[NOTICE] Game over. Player ' + player + ' has forfeit.');
-});
+socket.on('victory', function (data) {
+	$('#player' + data.victor).removeClass('current');
 
-socket.on('reset', function (data) {
-	$('#board td').removeClass();
-});
-
-// Create game board
-for(var i = 0; i < 19; i++){
-	$('#board table').append('<tr></tr>');
-
-	for(var j = 0; j < 19; j++) {
-		$('#board tr').last().append('<td></td>');
-		$('#board td').last().addClass('box').attr('data-row', i).attr('data-column', j);
+	// Update board
+	for (var i = 0; i < 19; i++) {
+		for (var j = 0; j < 19; j++) {
+			if (data.board[i][j] != board[i][j]) {
+				var target = $('#board td[data-row="' + i + '"][data-column="' + j + '"]');
+				target.removeClass();
+				if (data.board[i][j] != 0) {
+					target.addClass('active p' + data.board[i][j]);
+				}
+			}
+		}
 	}
-}
+
+	// Update capture scores
+	$('#pl-captures').text(data.captures[0]);
+	$('#p2-captures').text(data.captures[1]);
+
+	alert('Player ' + data.victor + ' is victor!');
+
+	// Task: Ask players for rematch
+});
+
+socket.on('forfeit', function (data) {
+	$('.player-info').removeClass('current');
+	$('#player' + data).removeClass('active');
+	$('#board td').removeClass();
+	var playAgain = confirm('Game over. Player ' + data + ' has forfeit. Play Again?');
+	if (playAgain) {
+		location.reload();
+	}
+});
 
 // Get board clicks
 $('#board td').click(function () {

@@ -8,10 +8,10 @@ var favicon = require('static-favicon');
 var logger = require('morgan');
 var cookieParser = require('cookie-parser');
 var bodyParser = require('body-parser');
-var debug = require('debug')('pente');
+var debug = require('debug')('cinco');
 var io = require('socket.io');
-var Pente = require('./pente');
 var _ = require('underscore');
+var Cinco = require('./cinco');
 
 var app = express();
 var games = {};
@@ -20,10 +20,11 @@ var games = {};
 /* App Variables
    ========================================================================== */
 
-app.set('port', process.env.PORT || 3000);
+// app.set('port', process.env.PORT || 3000);
+app.set('port', 80);
 app.set('views', path.join(__dirname, 'views'));
 app.set('view engine', 'jade');
-app.set('title', 'Pente');
+app.set('title', 'Cinco');
 
 
 /* Settings
@@ -133,6 +134,7 @@ server.sockets.on('connection', function (socket) {
 			if (game.players.length == 1) {
 				game.players.push(socket);
 				socket.pid = 2;
+				socket.captures = 0;
 				socket.emit('assign', socket.pid);
 				// Notify room of second player
 				socket.broadcast.to(socket.game).emit('start');
@@ -148,9 +150,10 @@ server.sockets.on('connection', function (socket) {
 			}
 
 		} else {
-			var game = new Pente(socket.game, [socket]);
+			var game = new Cinco(socket.game, [socket]);
 			games[socket.game] = game;
 			socket.pid = 1;
+			socket.captures = 0;
 			socket.emit('assign', socket.pid);
 		}
 	});
@@ -173,15 +176,18 @@ server.sockets.on('connection', function (socket) {
 				// Update board
 				game['board'][data.row][data.column] = socket.pid;
 
+				game['captures'][game['turn'] - 1] += game.checkCaptures([data.row,data.column]);
+
 				// Check for Victory
-				if (game.checkVictory()) {
+				if (game.checkVictory() || game['captures'][game['turn']] > 4) {
 					// Delete game and notify room of player's victory
-					delete games[socket.game];
 					server.sockets.to(socket.game).emit('victory', {
 						board: game['board'],
 						captures: game['captures'],
 						victor: game['turn']
 					});
+
+					delete games[socket.game];
 				} else {
 					// Change player turn
 					game['turn'] = (game['turn'] == 1) ? 2 : 1;

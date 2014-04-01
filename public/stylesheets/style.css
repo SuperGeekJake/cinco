@@ -68,7 +68,8 @@ main {
   cursor: default;
 }
 #board table td.victory {
-  border-color: #3498db;
+  border-color: #2980b9;
+  border-width: 2px;
 }
 #board table .p1 {
   background: #f1c40f;
