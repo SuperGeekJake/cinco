@@ -11,7 +11,6 @@ var bodyParser = require('body-parser');
 var debug = require('debug')('cinco');
 var io = require('socket.io');
 var _ = require('underscore');
-var Cinco = require('./cinco');
 
 var app = express();
 var games = {};
@@ -25,6 +24,8 @@ app.set('port', 80);
 app.set('views', path.join(__dirname, 'views'));
 app.set('view engine', 'jade');
 app.set('title', 'Cinco');
+
+var Cinco = require('./cinco');
 
 
 /* Settings
@@ -147,6 +148,11 @@ server.sockets.on('connection', function (socket) {
 			} else {
 				socket.pid = 0;
 				socket.emit('assign', socket.pid);
+				server.sockets.to(socket.game).emit('notify', {
+					board: game['board'],
+					captures: game['captures'],
+					turn: game['turn']
+				});
 			}
 
 		} else {
@@ -179,7 +185,7 @@ server.sockets.on('connection', function (socket) {
 				game['captures'][game['turn'] - 1] += game.checkCaptures([data.row,data.column]);
 
 				// Check for Victory
-				if (game.checkVictory() || game['captures'][game['turn']] > 4) {
+				if (game.checkVictory()) {
 					// Delete game and notify room of player's victory
 					server.sockets.to(socket.game).emit('victory', {
 						board: game['board'],

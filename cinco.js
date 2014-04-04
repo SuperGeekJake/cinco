@@ -40,19 +40,25 @@ function Cinco(ID, players) {
 }
 
 Cinco.prototype.checkVictory = function () {
+	if (this.captures[this.turn - 1] > 4) return true;
+
 	for (var row = 0; row < 19; row++) {
 		for (var column = 0; column < 19; column++) {
 			if (this.board[row][column] == this.turn) {
-				if (this.checkHorizontal([row,column])) return true;
-				if (this.checkVertical([row,column])) return true;
-				if (this.checkLeftDiagonal([row,column])) return true;
-				if (this.checkRightDiagonal([row,column])) return true;
+				return checkDirections();
 			}
 		}
 	}
 
 	return false;
 }
+
+Cinco.prototype.checkDirections = function () {
+	if (this.checkHorizontal([row,column])) return true;
+	if (this.checkVertical([row,column])) return true;
+	if (this.checkLeftDiagonal([row,column])) return true;
+	if (this.checkRightDiagonal([row,column])) return true;
+};
 
 Cinco.prototype.checkHorizontal = function (startPoint) {
 	// Info: startPoint = [row, column]
