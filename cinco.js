@@ -45,7 +45,7 @@ Cinco.prototype.checkVictory = function () {
 	for (var row = 0; row < 19; row++) {
 		for (var column = 0; column < 19; column++) {
 			if (this.board[row][column] == this.turn) {
-				return checkDirections();
+				return this.checkDirections(row, column);
 			}
 		}
 	}
@@ -53,7 +53,7 @@ Cinco.prototype.checkVictory = function () {
 	return false;
 }
 
-Cinco.prototype.checkDirections = function () {
+Cinco.prototype.checkDirections = function (row, column) {
 	if (this.checkHorizontal([row,column])) return true;
 	if (this.checkVertical([row,column])) return true;
 	if (this.checkLeftDiagonal([row,column])) return true;
