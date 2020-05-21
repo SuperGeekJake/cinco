@@ -1,0 +1,32 @@
+import * as React from 'react';
+import { Route, Redirect, Switch, BrowserRouter } from 'react-router-dom';
+import * as firebase from 'firebase/app';
+
+import { useSessionContext, ProtectedRoute } from './session';
+import Loading from './Loading';
+import Menu from './Menu';
+import Login from './Login';
+import Game from './Game';
+
+const Router: React.FC = () => {
+  const [state, session] = useSessionContext();
+  React.useEffect(() => {
+    if (state === 'ready' && !session) {
+      firebase.auth().signInAnonymously();
+    }
+  }, [state, session]);
+  // TODO: Handle auth error state
+  if (state === 'error' || !session) return <Loading />;
+  return (
+    <BrowserRouter>
+      <Switch>
+        <ProtectedRoute path='/game/:id' component={Game} />
+        <ProtectedRoute path='/menu' component={Menu} />
+        <Route path='/login' component={Login} />
+        <Redirect exact from='/' to='/menu' />
+      </Switch>
+    </BrowserRouter>
+  );
+}
+
+export default Router;
