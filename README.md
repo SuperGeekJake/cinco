@@ -2,8 +2,6 @@
 
 Web-based multiplayer board game inspired by Pente. Powered by Create React App, Vercel, and Firebase.
 
-[Website](https://cinco.supergeekjake.now.sh)
-
 This project was bootstrapped with [Create React App](https://github.com/facebook/create-react-app).
 
 ## Available Scripts
