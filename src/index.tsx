@@ -1,9 +1,11 @@
 import * as React from 'react';
 import * as ReactDOM from 'react-dom';
 import { BrowserRouter } from 'react-router-dom';
+import { Global, css } from '@emotion/core';
 import * as firebase from "firebase/app";
 import 'firebase/auth';
 import 'firebase/firestore';
+import 'normalize.css';
 
 import App from './App';
 import { SessionProvider } from './session';
@@ -22,13 +24,33 @@ firebase.initializeApp({
 });
 
 if (process.env.NODE_ENV !== 'production') {
-  window.firebase = firebase
+  window.firebase = firebase;
 }
+
+const globalStyles = css`
+  *, *:before, *:after {
+    box-sizing: inherit;
+  }
+
+  html, body {
+    box-sizing: border-box;
+    width: 100%;
+    height: 100%;
+    background-color: #f6f6f6;
+  }
+
+  #root {
+    display: flex;
+    width: 100%;
+    min-height: 100%;
+  }
+`;
 
 ReactDOM.render(
   <React.StrictMode>
     <SessionProvider>
       <BrowserRouter>
+        <Global styles={globalStyles} />
         <App />
       </BrowserRouter>
     </SessionProvider>

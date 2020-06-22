@@ -5,6 +5,16 @@ import App from './App';
 import { sessionContext, ContextValue } from './session';
 import { MemoryRouter } from 'react-router-dom';
 
+jest.mock('firebase/app', () => ({
+  firestore: () => ({
+    collection: () => ({
+      doc: () => ({
+        onSnapshot: () => {}
+      })
+  })
+  })
+}));
+
 test('renders loading while determining auth session', () => {
   const mockSession: [['loading', null], jest.Mock] = [['loading', null], jest.fn()];
   const app = render(<MockContext session={mockSession}><App /></MockContext>);
