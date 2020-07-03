@@ -8,7 +8,6 @@ export default function LoginScreen() {
   const location = useLocation<{ from?: Location }>();
   const from = location.state?.from?.pathname || '/menu';
   const { register, handleSubmit, errors } = useForm();
-  debugger
   const user = useSession();
   const setUser = useSetSession();
   const onSubmit = ({ name }: Record<string, any>) => {
