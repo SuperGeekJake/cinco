@@ -1,7 +1,6 @@
-import produce from 'immer';
-import { Reducer } from 'react';
+import { produce } from 'immer';
 
-import { DerivedState } from './types';
+import { DerivedState, User } from '../types';
 import { Action } from './actions';
 import {
   getNextPlayerID,
@@ -16,25 +15,28 @@ export const initState: DerivedState = {
   started: false,
   gameover: false,
   currentPlayer: null,
-  players: {
-    'red': {
-      active: true,
-      displayName: 'Player Red',
-      order: 0,
-      captures: 0
-    },
-    'blue': {
-      active: true,
-      displayName: 'Player Blue',
-      order: 1,
-      captures: 0
-    }
-  },
+  order: [],
+  players: {},
   board: {},
 };
 
-export const reducer: Reducer<DerivedState, Action> = produce((draft, action) => {
+type ContextAction = Action & {
+  context: { user: User },
+};
+
+export const reducer = produce((draft: DerivedState, action: ContextAction) => {
+  const { uid: playerID, displayName } = action.context.user;
+
   switch (action.type) {
+    case 'join': {
+      draft.order.push(playerID);
+      draft.players[playerID] = {
+        active: true,
+        displayName,
+        captures: 0,
+      };
+      return;
+    }
     case 'start': {
       draft.started = true;
       draft.currentPlayer = getNextPlayerID(draft);
@@ -45,7 +47,7 @@ export const reducer: Reducer<DerivedState, Action> = produce((draft, action) =>
       return;
     }
     case 'token': {
-      const { playerID, coord } = action.payload;
+      const { coord } = action.payload;
       // Set token on board
       draft.board[getCoordStr(coord)] = playerID;
 
@@ -78,10 +80,17 @@ export const reducer: Reducer<DerivedState, Action> = produce((draft, action) =>
       return;
     }
     case 'quit': {
-      const { playerID } = action.payload;
-      draft.gameover = true;
-      draft.currentPlayer = null;
-      draft.players[playerID].active = false;
+      if (draft.started) {
+        delete draft.players[playerID];
+        const playerOrder = draft.order.indexOf(playerID);
+        draft.order.splice(playerOrder, 1);
+      } else {
+        draft.gameover = true;
+        draft.currentPlayer = null;
+        draft.players[playerID].active = false;
+      }
+
+      return;
     }
   }
 });

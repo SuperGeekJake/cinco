@@ -1,82 +1,62 @@
 import * as React from 'react';
-import styled from '@emotion/styled';
 
+import firebase from '../firebase';
 import { reducer, initState } from './reducer';
-import { getPlayersByOrder } from './selectors';
-import { Coordinates } from './types';
-import Board from './Board';
+import { DerivedState, User } from '../types';
+import { useSession } from '../session';
+import { useParams, Redirect } from 'react-router-dom';
+import LoadingScreen from '../Loading';
+import useStreamState from '../useStreamState';
+import { Action, joinGame } from './actions';
+import Game from './Game';
+import { GameContext } from './context';
 
-const GameScreen: React.FC = () => {
-  const [userID, setUserID] = React.useState('red');
-  const [state, dispatch] = React.useReducer(reducer, initState);
-  const players = getPlayersByOrder(state);
-  const onStartButton = () => { dispatch({ type: 'start', payload: { playerID: userID } }); };
-  const onCancelButton = () => { dispatch({ type: 'cancel', payload: { playerID: userID } }); };
-  const onSelectToken = (coord: Coordinates) => {
-    dispatch({ type: 'token', payload: { playerID: userID, coord } });
-    setUserID(userID === 'red' ? 'blue' : 'red');
-  };
+const GameScreen = () => {
+  const { id } = useParams<{ id?: string }>();
+  const [[state, data], onNext, onError] = useStreamState<Game, Error>();
+  const user = useSession() as User;
+  const [redirect, setRedirect] = React.useState<string | null>(null);
+
+  React.useEffect(() => {
+    if (!id) {
+      const ref = gamesCollection.doc();
+      const action = { ...joinGame(), context: { user } };
+      ref.set(reducer(initState, action))
+        .then(() => { setRedirect(ref.id); })
+        .catch(onError)
+      ;
+    } else {
+      gamesCollection.doc(id).onSnapshot(onNext, onError);
+    }
+  }, [id, onNext, onError, user]);
+
+  const contextValue = React.useMemo(() => {
+    if (!data || data instanceof Error) return null;
+    const state = data.data();
+    if (!state) return null;
+
+    const dispatch = (action: Action) => {
+      const contextAction = { ...action, context: { user } };
+      data.ref.update(reducer(state, contextAction));
+    };
+
+    return [state, dispatch] as const;
+  }, [data, user]);
+
+  if (redirect && id !== redirect) return <Redirect to={`/game/${redirect}`} />;
+  if (state !== 'ready') return <LoadingScreen error={data as Error | null} />;
+  if (!contextValue) return <div>Game not found.</div>;
   return (
-    <Root data-testid="gameScreen">
-      {!state.started && (
-        <React.Fragment>
-          {state.gameover && (
-            <div>Game Cancelled</div>
-          )}
-          {!state.gameover && (
-            <div>
-              <h1>Lobby screen</h1>
-              <ul>
-                {players.map(({ id, displayName }) => (
-                  <li key={id} data-me={userID === id}>{displayName}</li>
-                ))}
-              </ul>
-              <button onClick={onStartButton}>Start Game</button>
-              <button onClick={onCancelButton}>Cancel Game</button>
-            </div>
-          )}
-        </React.Fragment>
-      )}
-      {state.started && (
-        <React.Fragment>
-          {players.map(({ id, order, displayName, captures }) => (
-            <PlayerView key={id} order={order} currentUser={userID === id}>
-              <div>{displayName}</div>
-              <div>Captures: {captures}</div>
-            </PlayerView>
-          ))}
-          <StyledBoard
-            state={state}
-            userID={userID}
-            onSelectToken={onSelectToken}
-          />
-        </React.Fragment>
-      )}
-    </Root>
+    <GameContext.Provider value={contextValue}>
+      <Game />
+    </GameContext.Provider>
   );
 };
 
 export default GameScreen;
 
-const Root = styled.div`
-  display: grid;
-  grid-template-columns: 15% 70% 15%;
-  grid-template-rows: auto;
-  grid-template-areas:
-    "p0 board p1"
-    "p2 board p3";
-  align-content: center;
-  width: 100%;
-  padding: 20px;
-`;
-
-const StyledBoard = styled(Board)`
-  grid-area: board;
-`;
-
-const PlayerView = styled.div<{ order: number, currentUser: boolean }>`
-  grid-area: p${p => p.order};
-  padding: 10px;
-  background: ${p => p.currentUser ? '#fff' : 'transparent'};
-  border-radius: 6px;
-`;
+const gamesCollection = firebase.firestore().collection('games') as firebase.firestore.CollectionReference<DerivedState>;
+// const producePatches = (state: DerivedState, action: Action) => {
+//   const [, patches] = reducer(state, action);
+//   return patches;
+// };

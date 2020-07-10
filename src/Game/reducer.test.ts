@@ -1,9 +1,13 @@
-import { reducer, initState } from './reducer';
-import { Coordinates } from './types';
+import produce from 'immer';
+
+import { reducer as recipe, initState } from './reducer';
+import { Coordinates, DerivedState, User } from '../types';
+
+const reducer = produce(recipe);
 
 test('check for a capture', () => {
   const state = {
-    ...initState,
+    ...testState,
     started: true,
     currentPlayer: 'blue',
     board: {
@@ -14,7 +18,11 @@ test('check for a capture', () => {
   };
   const result = reducer(
     state,
-    { type: 'token', payload: { playerID: 'blue', coord: [0, 3] as Coordinates } },
+    {
+      type: 'token',
+      payload: { coord: [0, 3] as Coordinates },
+      context: { user: mockUser },
+    },
   );
 
   expect(result).toStrictEqual({
@@ -37,7 +45,7 @@ test('check for a capture', () => {
 describe('check for victory', () => {
   test('by 5-in-a-row', () => {
     const state = {
-      ...initState,
+      ...testState,
       started: true,
       currentPlayer: 'blue',
       board: {
@@ -49,7 +57,11 @@ describe('check for victory', () => {
     };
     const result = reducer(
       state,
-      { type: 'token', payload: { playerID: 'blue', coord: [0, 2] as Coordinates } },
+      {
+        type: 'token',
+        payload: { coord: [0, 2] as Coordinates },
+        context: { user: mockUser },
+      },
     );
 
     expect(result).toStrictEqual({
@@ -72,12 +84,12 @@ describe('check for victory', () => {
 
   test('by captures', () => {
     const state = {
-      ...initState,
+      ...testState,
       started: true,
       currentPlayer: 'blue',
       players: {
         blue: {
-          ...initState.players.blue,
+          ...testState.players.blue,
           captures: 4,
         }
       },
@@ -89,7 +101,11 @@ describe('check for victory', () => {
     };
     const result = reducer(
       state,
-      { type: 'token', payload: { playerID: 'blue', coord: [0, 3] as Coordinates } },
+      {
+        type: 'token',
+        payload: { coord: [0, 3] as Coordinates },
+        context: { user: mockUser },
+      },
     );
 
     expect(result).toStrictEqual({
@@ -110,3 +126,22 @@ describe('check for victory', () => {
     });
   });
 });
+
+const testState: DerivedState = {
+  ...initState,
+  order: ['red', 'blue'],
+  players: {
+    'red': {
+      active: true,
+      displayName: 'Player Red',
+      captures: 0,
+    },
+    'blue': {
+      active: true,
+      displayName: 'Player Blue',
+      captures: 0,
+    },
+  },
+};
+
+const mockUser = { uid: 'blue', displayName: 'Player Blue' } as User;
