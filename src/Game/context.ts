@@ -1,10 +1,10 @@
 import * as React from 'react';
 
-import { DerivedState } from '../types';
+import { GameState } from '../types';
 import { Action } from './actions';
 
 type Dispatch = (action: Action) => void;
-type GameContext = readonly [DerivedState, Dispatch];
+type GameContext = readonly [GameState, Dispatch];
 
 export const GameContext = React.createContext<GameContext | null>(null);
 
@@ -14,7 +14,7 @@ const useContext = () => {
   return context;
 };
 
-export const useSelector = <T>(selector: (state: DerivedState, ...args: any[]) => T, ...args: any[]) => {
+export const useSelector = <T>(selector: (state: GameState, ...args: any[]) => T, ...args: any[]) => {
   const [state] = useContext();
   return selector(state, ...args);
 };

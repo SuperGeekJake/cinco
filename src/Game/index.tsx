@@ -2,7 +2,7 @@ import * as React from 'react';
 
 import firebase from '../firebase';
 import { reducer, initState } from './reducer';
-import { DerivedState, User } from '../types';
+import { GameState, User } from '../types';
 import { useSession } from '../session';
 import { useParams, Redirect } from 'react-router-dom';
 import LoadingScreen from '../Loading';
@@ -55,7 +55,7 @@ const GameScreen = () => {
 
 export default GameScreen;
 
-const gamesCollection = firebase.firestore().collection('games') as firebase.firestore.CollectionReference<DerivedState>;
+const gamesCollection = firebase.firestore().collection('games') as firebase.firestore.CollectionReference<GameState>;
 // const producePatches = (state: DerivedState, action: Action) => {
 //   const [, patches] = reducer(state, action);
 //   return patches;

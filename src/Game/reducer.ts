@@ -1,35 +1,36 @@
 import { produce } from 'immer';
 
-import { DerivedState, User } from '../types';
+import { GameState, User, Coordinates } from '../types';
 import { Action } from './actions';
 import {
   getNextPlayerID,
-  getCoordStr,
-  getDirectionCoordValue,
+  getTokenID,
+  getDirectionTokenValue,
   DIRECTIONS,
-  getDirectionCoordStr
+  getDirectionTokenID,
+  getNextPlayerOrder
 } from './selectors';
 
-// TODO: Create a real initState
-export const initState: DerivedState = {
-  started: false,
-  gameover: false,
-  currentPlayer: null,
-  order: [],
-  players: {},
+export const initState: GameState = {
   board: {},
+  currentOrder: null,
+  currentPlayer: null,
+  gameover: false,
+  playerOrder: [],
+  players: {},
+  started: false,
 };
 
 type ContextAction = Action & {
   context: { user: User },
 };
 
-export const reducer = produce((draft: DerivedState, action: ContextAction) => {
+export const reducer = produce((draft: GameState, action: ContextAction) => {
   const { uid: playerID, displayName } = action.context.user;
 
   switch (action.type) {
     case 'join': {
-      draft.order.push(playerID);
+      draft.playerOrder.push(playerID);
       draft.players[playerID] = {
         active: true,
         displayName,
@@ -40,6 +41,7 @@ export const reducer = produce((draft: DerivedState, action: ContextAction) => {
     case 'start': {
       draft.started = true;
       draft.currentPlayer = getNextPlayerID(draft);
+      draft.currentOrder = getNextPlayerOrder(draft);
       return;
     }
     case 'cancel': {
@@ -49,32 +51,22 @@ export const reducer = produce((draft: DerivedState, action: ContextAction) => {
     case 'token': {
       const { coord } = action.payload;
       // Set token on board
-      draft.board[getCoordStr(coord)] = playerID;
+      draft.board[getTokenID(coord)] = playerID;
 
-      const getBoardCoord = getDirectionCoordValue(draft, coord);
-      // Check for 5-in-a-row's or captures
-      // loop through the 4 row directions
-      for (let d = 0; d < DIRECTIONS.length; d++) {
-        const getCoord = getBoardCoord(d);
+      getCaptures(draft, playerID, coord).forEach(([tid1, tid2]) => {
+        draft.players[playerID].captures++;
+        delete draft.board[tid1];
+        delete draft.board[tid2];
+      });
 
-        // Check for a capture in either direction within the row
-        for (const rD of [1, -1] as const) {
-          if (isCapture(getCoord, playerID, rD)) {
-            delete draft.board[getDirectionCoordStr(coord, d, 1 * rD)];
-            delete draft.board[getDirectionCoordStr(coord, d, 2 * rD)];
-            draft.players[playerID].captures++;
-          }
-        }
-
-        draft.gameover = draft.gameover || isRowVictory(getCoord, playerID);
-      }
-
-      if (draft.players[playerID].captures >= VICTORY_COUNT) {
-        draft.gameover = true;
-      }
+      draft.gameover = (
+        draft.players[playerID].captures >= VICTORY_COUNT ||
+        hasRowVictory(draft, playerID, coord)
+      );
 
       if (!draft.gameover) {
         draft.currentPlayer = getNextPlayerID(draft);
+        draft.currentOrder = getNextPlayerOrder(draft);
       }
 
       return;
@@ -82,8 +74,8 @@ export const reducer = produce((draft: DerivedState, action: ContextAction) => {
     case 'quit': {
       if (draft.started) {
         delete draft.players[playerID];
-        const playerOrder = draft.order.indexOf(playerID);
-        draft.order.splice(playerOrder, 1);
+        const playerOrder = draft.playerOrder.indexOf(playerID);
+        draft.playerOrder.splice(playerOrder, 1);
       } else {
         draft.gameover = true;
         draft.currentPlayer = null;
@@ -102,7 +94,7 @@ const FINAL_INDEX = 4;
 // Starting index position in a row
 const START_INDEX = -FINAL_INDEX;
 
-type Getter = ReturnType<ReturnType<typeof getDirectionCoordValue>>;
+type Getter = ReturnType<ReturnType<typeof getDirectionTokenValue>>;
 
 const isRowVictory = (getter: Getter, playerID: string) => {
   let row = 0;
@@ -121,3 +113,40 @@ const isCapture = (getter: Getter, playerID: string, direction: 1 | -1) =>
     && (!!getter(2 * direction) && getter(2 * direction) !== playerID)
     && getter(3 * direction) === playerID
   );
+
+const getCaptures = (state: GameState, playerID: string, coord: Coordinates) => {
+  const captures: [string, string][] = [];
+  const getBoardCoord = getDirectionTokenValue(state, coord);
+
+  // Check for 5-in-a-row's or captures
+  // loop through the 4 row directions
+  for (let d = 0; d < DIRECTIONS.length; d++) {
+    const getCoord = getBoardCoord(d);
+
+    // Check for a capture in either direction within the row
+    for (const rD of [1, -1] as const) {
+      if (isCapture(getCoord, playerID, rD)) {
+        const tokenID1 = getDirectionTokenID(coord, d, 1 * rD);
+        const tokenID2 = getDirectionTokenID(coord, d, 2 * rD);
+
+        captures.push([tokenID1, tokenID2]);
+      }
+    }
+  }
+
+  return captures;
+};
+
+const hasRowVictory = (state: GameState, playerID: string, coord: Coordinates) => {
+  let victory = false;
+  const getBoardCoord = getDirectionTokenValue(state, coord);
+  // Check for 5-in-a-row's or captures
+  // loop through the 4 row directions
+  for (let d = 0; d < DIRECTIONS.length; d++) {
+    const getCoord = getBoardCoord(d);
+    victory = isRowVictory(getCoord, playerID);
+    if (victory) break;
+  }
+
+  return victory;
+};

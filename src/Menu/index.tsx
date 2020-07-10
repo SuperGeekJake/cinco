@@ -5,9 +5,9 @@ import styled from '@emotion/styled';
 import firebase from '../firebase';
 import useStreamState from '../useStreamState';
 import { useSession } from '../session';
-import { DerivedState, QuerySnapshot } from '../types';
+import { GameState, QuerySnapshot } from '../types';
 
-type Games = QuerySnapshot<DerivedState>;
+type Games = QuerySnapshot<GameState>;
 
 const db = firebase.firestore();
 

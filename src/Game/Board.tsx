@@ -1,7 +1,7 @@
 import * as React from 'react';
 import styled from '@emotion/styled';
 
-import { getCoordStr } from './selectors';
+import { getTokenID } from './selectors';
 import { Coordinates } from '../types';
 import { useSelector } from './context';
 import Token from './Token';
@@ -14,7 +14,7 @@ const Board: React.FC<Props> = ({ className }) => {
   const isGameover = useSelector(state => state.gameover);
   const currentPlayer = useSelector(state => state.currentPlayer);
   const players = useSelector(state => state.players);
-  const playOrder = useSelector(state => state.order);
+  const playOrder = useSelector(state => state.playerOrder);
 
   // const isVictory = isGameover && !!currentPlayer;
   // const isPlayerLeft = state.gameover && !state.currentPlayer;
@@ -23,7 +23,7 @@ const Board: React.FC<Props> = ({ className }) => {
       <TokenGrid>
         {renderTokens((coord) => (
           <Token
-            key={getCoordStr(coord)}
+            key={getTokenID(coord)}
             coord={coord}
           />
         ))}

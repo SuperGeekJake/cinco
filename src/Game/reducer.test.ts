@@ -1,7 +1,7 @@
 import produce from 'immer';
 
 import { reducer as recipe, initState } from './reducer';
-import { Coordinates, DerivedState, User } from '../types';
+import { Coordinates, GameState, User } from '../types';
 
 const reducer = produce(recipe);
 
@@ -10,6 +10,7 @@ test('check for a capture', () => {
     ...testState,
     started: true,
     currentPlayer: 'blue',
+    currentOrder: 1,
     board: {
       '0x0': 'blue',
       '0x1': 'red',
@@ -28,6 +29,7 @@ test('check for a capture', () => {
   expect(result).toStrictEqual({
     ...state,
     currentPlayer: 'red',
+    currentOrder: 0,
     players: {
       ...state.players,
       'blue': {
@@ -48,6 +50,7 @@ describe('check for victory', () => {
       ...testState,
       started: true,
       currentPlayer: 'blue',
+      currentOrder: 1,
       board: {
         '0x0': 'blue',
         '0x1': 'blue',
@@ -68,6 +71,7 @@ describe('check for victory', () => {
       ...state,
       gameover: true,
       currentPlayer: 'blue',
+      currentOrder: 1,
       players: {
         ...state.players,
         'blue': {
@@ -87,6 +91,7 @@ describe('check for victory', () => {
       ...testState,
       started: true,
       currentPlayer: 'blue',
+      currentOrder: 1,
       players: {
         blue: {
           ...testState.players.blue,
@@ -112,6 +117,7 @@ describe('check for victory', () => {
       ...state,
       gameover: true,
       currentPlayer: 'blue',
+      currentOrder: 1,
       players: {
         ...state.players,
         'blue': {
@@ -127,9 +133,9 @@ describe('check for victory', () => {
   });
 });
 
-const testState: DerivedState = {
+const testState: GameState = {
   ...initState,
-  order: ['red', 'blue'],
+  playerOrder: ['red', 'blue'],
   players: {
     'red': {
       active: true,

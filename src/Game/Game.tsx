@@ -2,14 +2,14 @@ import * as React from 'react';
 import styled from '@emotion/styled';
 
 import { getPlayersByOrder } from './selectors';
-import { DerivedState, DocumentSnapshot, Order } from '../types';
+import { GameState, DocumentSnapshot } from '../types';
 import { playerColors } from '../styles';
 import Board from './Board';
 import Lobby from './Lobby';
 import { useSession } from '../session';
 import { useSelector } from './context';
 
-type Game = DocumentSnapshot<DerivedState>;
+type Game = DocumentSnapshot<GameState>;
 
 const Game: React.FC = () => {
   const { uid: userID } = useSession();
@@ -29,7 +29,7 @@ const Game: React.FC = () => {
             <PlayerContainer key={id} playerOrder={index}>
               <PlayerView isCurrentPlayer={isCurrentPlayer(id)}>
                 <PlayerContent>
-                  <DisplayName isUser={isUser(id)} playerOrder={index as Order}>{displayName}</DisplayName>
+                  <DisplayName isUser={isUser(id)} playerOrder={index}>{displayName}</DisplayName>
                   <div>Captures: {captures}</div>
                 </PlayerContent>
               </PlayerView>
@@ -86,8 +86,14 @@ const PlayerContent = styled.div`
   align-items: center;
 `;
 
-const DisplayName = styled.div<{ playerOrder: Order, isUser: boolean }>`
+const DisplayName = styled.div<{ playerOrder: number, isUser: boolean }>`
   font-size: 20px;
   font-weight: bold;
-  color: ${p => playerColors[p.playerOrder]};
+  color: ${p => getPlayerColor(p.playerOrder)};
 `;
+
+const getPlayerColor = (playerOrder: number) => {
+  const color: string | undefined = playerColors[playerOrder];
+  if (!color) throw new Error('Bad playerOrder provided');
+  return color;
+}

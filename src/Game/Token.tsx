@@ -3,8 +3,8 @@ import styled from '@emotion/styled';
 import { css } from '@emotion/core';
 
 import { playerColors } from '../styles';
-import { getCoordStr, getOrderFromCoord, isCurrentPlayer } from './selectors';
-import { Coordinates, Active, DerivedState } from '../types';
+import { getOrderFromToken, getIsCurrentPlayer } from './selectors';
+import { Coordinates, GameState } from '../types';
 import { useDispatch, useSelector } from './context';
 import { placeToken } from './actions';
 import { useSession } from '../session';
@@ -19,13 +19,11 @@ const Token: React.FC<Props> = ({ coord }) => {
   const dispatch = useDispatch();
   const handleClick = () => { dispatch(placeToken(coord)); };
 
-  const key = getCoordStr(coord);
-  const active = useSelector(getOrderFromCoord, coord);
+  const active = useSelector(getOrderFromToken, coord);
   const isDisabled = useSelector(getIsDisabled, userID, coord);
 
   return (
     <Root
-      key={key}
       active={active}
       disabled={isDisabled}
       onClick={handleClick}
@@ -35,10 +33,10 @@ const Token: React.FC<Props> = ({ coord }) => {
 
 export default Token;
 
-const getIsDisabled = (state: DerivedState, playerID: string, coord: Coordinates) =>
-  state.gameover || !isCurrentPlayer(state, playerID) || getOrderFromCoord(state, coord) !== null;
+const getIsDisabled = (state: GameState, playerID: string, coord: Coordinates) =>
+  state.gameover || !getIsCurrentPlayer(state, playerID) || getOrderFromToken(state, coord) !== null;
 
-const Root = styled.button<{ active: Active, disabled: boolean }>`
+const Root = styled.button<{ active: number | null, disabled: boolean }>`
   height: 100%;
   padding: 2px;
   border: none;

@@ -1,7 +1,6 @@
 import * as React from 'react';
 
-import { getPlayersByOrder } from './selectors';
-import { DerivedState } from '../types';
+import { getPlayersByOrder, getIsGameHost, getIsPlayer } from './selectors';
 import { startGame, cancelGame, quitGame, joinGame } from './actions';
 import { useDispatch, useSelector } from './context';
 import { useSession } from '../session';
@@ -67,6 +66,3 @@ const Lobby: React.FC = () => {
 }
 
 export default Lobby;
-
-const getIsGameHost = (state: DerivedState, playerID: string) => getPlayersByOrder(state)[0].id === playerID;
-const getIsPlayer = (state: DerivedState, userID: string) => !!state.players[userID];
