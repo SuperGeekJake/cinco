@@ -1,4 +1,4 @@
-import { Coordinates, DerivedState } from './types';
+import { Coordinates, DerivedState, Order } from '../types';
 
 export const DIRECTIONS = [
   [-1, -1], [0,-1], [1,-1],
@@ -20,29 +20,26 @@ export const getDirectionCoordValue = (state: DerivedState, coord: Coordinates) 
   getCoordValue(state, getDirectionCoord(coord, direction, position));
 
 export const getPlayersByOrder = (state: DerivedState) =>
-  Object.entries(state.players)
-    .map(([id, player]) => ({ id, ...player }))
-    .sort((a, b) => a.order - b.order);
+  state.order.map((id) => ({ id, ...state.players[id] }));
 
 export const getNextPlayerID = (state: DerivedState) => {
-  let nextOrder: number;
+  let nextOrder: Order;
   if (state.currentPlayer) {
-    const playerCount = Object.keys(state.players).length as 1 | 2 | 3 | 4;
-    const currentOrder = state.players[state.currentPlayer].order;
-    nextOrder = (currentOrder + 1) % playerCount;
+    const playerCount = state.order.length as 1 | 2 | 3 | 4;
+    const currentOrder = state.order.indexOf(state.currentPlayer) as Order;
+    nextOrder = (currentOrder + 1) % playerCount as Order;
   } else {
     nextOrder = 0;
   }
 
-  return getPlayersByOrder(state)[nextOrder].id;
+  return state.order[nextOrder];
 }
 
 export const getOrderFromCoord = (state: DerivedState, coord: Coordinates) => {
   const playerID = getCoordValue(state, coord);
-  if (!playerID) return;
-  const player = state.players[playerID];
-  return player.order;
+  if (!playerID) return null;
+  return state.order.indexOf(playerID) as Order;
 };
 
 export const isCurrentPlayer = (state: DerivedState, playerID: string) =>
-  state.currentPlayer === playerID
+  state.currentPlayer === playerID;

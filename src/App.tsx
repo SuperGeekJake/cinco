@@ -1,7 +1,7 @@
 import * as React from 'react';
 import { Route, Redirect, Switch } from 'react-router-dom';
-import * as firebase from 'firebase/app';
 
+import firebase from './firebase';
 import { useSessionContext, ProtectedRoute } from './session';
 import Loading from './Loading';
 import Menu from './Menu';

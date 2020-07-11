@@ -1,33 +1,38 @@
 import * as React from 'react';
 import styled from '@emotion/styled';
-import { css } from '@emotion/core';
 
-import { playerColors } from '../styles';
-import { getCoordStr, getOrderFromCoord, isCurrentPlayer } from './selectors';
-import { Coordinates, Active, DerivedState } from './types';
+import { getCoordStr } from './selectors';
+import { Coordinates } from '../types';
+import { useSelector } from './context';
+import Token from './Token';
 
 type Props = {
   className?: string,
-  state: DerivedState,
-  userID: string,
-  onSelectToken: (coord: Coordinates) => void,
 };
 
-const Board: React.FC<Props> = ({ className, state, userID, onSelectToken }) => {
+const Board: React.FC<Props> = ({ className }) => {
+  const isGameover = useSelector(state => state.gameover);
+  const currentPlayer = useSelector(state => state.currentPlayer);
+  const players = useSelector(state => state.players);
+  const playOrder = useSelector(state => state.order);
+
+  // const isVictory = isGameover && !!currentPlayer;
+  // const isPlayerLeft = state.gameover && !state.currentPlayer;
   return (
     <Root className={className}>
       <TokenGrid>
         {renderTokens((coord) => (
           <Token
             key={getCoordStr(coord)}
-            active={getOrderFromCoord(state, coord)}
-            disabled={isDisabled(state, userID, coord)}
-            onClick={() => onSelectToken(coord)}
+            coord={coord}
           />
         ))}
       </TokenGrid>
+      {isVictory(isGameover, currentPlayer) && (
+        <Log>Player {playOrder.indexOf(currentPlayer) + 1} <em>"{players[currentPlayer].displayName}"</em> has won.</Log>
+      )}
     </Root>
-  )
+  );
 };
 
 export default Board;
@@ -37,13 +42,12 @@ const renderTokens = (mapFn: (coord: Coordinates) => React.ReactNode) =>
   Array.from({ length: BOARD_SIZE }).map((_, x) =>
     Array.from({ length: BOARD_SIZE }).map((_, y) => mapFn([x, y] as Coordinates))
   );
-const isUndefined = (val: any) => val === undefined;
-const isDisabled = (state: DerivedState, playerID: string, coord: Coordinates) =>
-  state.gameover || !isCurrentPlayer(state, playerID) || !isUndefined(getOrderFromCoord(state, coord));
+
+const isVictory = (isGameover: boolean, currentPlayer: string | null): currentPlayer is string =>
+  isGameover && !!currentPlayer;
 
 const Root = styled.div`
   height: 0;
-  overflow: hidden;
   padding-top: 100%;
   position: relative;
 `;
@@ -60,31 +64,8 @@ const TokenGrid = styled.div`
   padding: 20px;
 `;
 
-const Token = styled.button<{ active: Active, disabled: boolean }>`
-  height: 100%;
-  padding: 2px;
-  border: none;
-  background: none;
-  cursor: ${p => p.disabled ? 'default' : 'pointer'};
-
-  &:before {
-    content: "";
-    float: left;
-    padding-bottom: 100%;
-  }
-
-  &:after {
-    content: "";
-    display: block;
-    height: 100%;
-    border: 1px solid #ddd;
-    background: #fff;
-    box-shadow: inset 0 1px 5px rgba(0, 0, 0, 0.2);
-    border-radius: 4px;
-    ${p => !isUndefined(p.active) && css`
-      border: none;
-      background: ${playerColors[p.active as 0 | 1 | 2 | 3]};
-      box-shadow: 0 1px 4px rgba(0, 0, 0, 0.1);
-    `};
-  }
+const Log = styled.h3`
+  margin: 0;
+  padding: 20px;
+  text-align: center;
 `;

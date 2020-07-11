@@ -1,28 +1,30 @@
-import { Coordinates } from './types';
+import { Coordinates } from '../types';
 
-export const placeToken = (playerID: string, coord: Coordinates) => ({
-  type: 'token' as const,
-  payload: { playerID, coord },
+export const joinGame = () => ({
+  type: 'join' as const,
 });
 
-export const startGame = (playerID: string) => ({
+export const startGame = () => ({
   type: 'start' as const,
-  payload: { playerID },
 });
 
-export const cancelGame = (playerID: string) => ({
+export const cancelGame = () => ({
   type: 'cancel' as const,
-  payload: { playerID },
 });
 
-export const quitGame = (playerID: string) => ({
+export const placeToken = (coord: Coordinates) => ({
+  type: 'token' as const,
+  payload: { coord },
+});
+
+export const quitGame = () => ({
   type: 'quit' as const,
-  payload: { playerID },
 });
 
 export type Action =
-  | ReturnType<typeof placeToken>
+  | ReturnType<typeof joinGame>
   | ReturnType<typeof startGame>
   | ReturnType<typeof cancelGame>
+  | ReturnType<typeof placeToken>
   | ReturnType<typeof quitGame>
 ;
