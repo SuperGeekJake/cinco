@@ -7,7 +7,7 @@ export type QuerySnapshot<T> = firebase.firestore.QuerySnapshot<T>;
 export type UserID = string;
 export type Coordinates = [number, number];
 
-export type Board = { [coordinates: string]: string };
+export type Board = { [coordinates: string]: string; };
 
 export type Player = {
   active: boolean,

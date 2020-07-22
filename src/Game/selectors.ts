@@ -1,9 +1,9 @@
 import { Coordinates, GameState } from '../types';
 
 export const DIRECTIONS = [
-  [-1, -1], [0,-1], [1,-1],
+  [-1, -1], [0, -1], [1, -1],
   [-1, 0],//        [1, 0],
-//[-1, 1],  [0, 1], [1, 1],
+  //[-1, 1],  [0, 1], [1, 1],
 ] as const;
 
 export const getTokenID = ([x, y]: Coordinates) => `${x}x${y}`;

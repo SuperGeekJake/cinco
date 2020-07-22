@@ -1,7 +1,7 @@
 import produce from 'immer';
 
 import { reducer as recipe, initState } from './reducer';
-import { Coordinates, GameState, User } from '../types';
+import { Coordinates, GameState } from '../types';
 
 const reducer = produce(recipe);
 
@@ -22,7 +22,7 @@ test('check for a capture', () => {
     {
       type: 'token',
       payload: { coord: [0, 3] as Coordinates },
-      context: { user: mockUser },
+      context: mockPlayer,
     },
   );
 
@@ -63,7 +63,7 @@ describe('check for victory', () => {
       {
         type: 'token',
         payload: { coord: [0, 2] as Coordinates },
-        context: { user: mockUser },
+        context: mockPlayer,
       },
     );
 
@@ -109,7 +109,7 @@ describe('check for victory', () => {
       {
         type: 'token',
         payload: { coord: [0, 3] as Coordinates },
-        context: { user: mockUser },
+        context: mockPlayer,
       },
     );
 
@@ -150,4 +150,4 @@ const testState: GameState = {
   },
 };
 
-const mockUser = { uid: 'blue', displayName: 'Player Blue' } as User;
+const mockPlayer = { playerID: 'blue', displayName: 'Player Blue' };

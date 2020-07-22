@@ -70,7 +70,7 @@ const useGames = () => {
   React.useEffect(() => {
     // TODO: Fix this where()
     db.collection('games').where(`users.${user.uid}`, '==', true).get()
-      .then((games) => { onNext(games as Games) })
+      .then((games) => { onNext(games as Games); })
       .catch((error) => {
         console.error(error);
         onError(error);

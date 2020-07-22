@@ -2,11 +2,10 @@ import * as React from 'react';
 
 import { getPlayersByOrder, getIsGameHost, getIsPlayer } from './selectors';
 import { startGame, cancelGame, quitGame, joinGame } from './actions';
-import { useDispatch, useSelector } from './context';
-import { useSession } from '../session';
+import { useDispatch, useSelector, usePlayer } from './context';
 
 const Lobby: React.FC = () => {
-  const { uid: userID } = useSession();
+  const user = usePlayer();
 
   const dispatch = useDispatch();
   const onStartButton = () => { dispatch(startGame()); };
@@ -15,8 +14,8 @@ const Lobby: React.FC = () => {
   const onJoinButton = () => { dispatch(joinGame()); };
 
   const players = useSelector(getPlayersByOrder);
-  const isGameHost = useSelector(getIsGameHost, userID);
-  const isPlayer = useSelector(getIsPlayer, userID);
+  const isGameHost = useSelector(getIsGameHost, user.playerID);
+  const isPlayer = useSelector(getIsPlayer, user.playerID);
   const gameover = useSelector(state => state.gameover);
 
   return (
@@ -29,7 +28,7 @@ const Lobby: React.FC = () => {
           <h1>Lobby screen</h1>
           <ul>
             {players.map(({ id, displayName }) => (
-              <li key={id} data-me={userID === id}>{displayName}</li>
+              <li key={id} data-me={user.playerID === id}>{displayName}</li>
             ))}
           </ul>
           {players.length < 2 && <p>Waiting on players to join...</p>}
@@ -63,6 +62,6 @@ const Lobby: React.FC = () => {
       )}
     </>
   );
-}
+};
 
 export default Lobby;

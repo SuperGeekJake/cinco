@@ -1,6 +1,6 @@
 import { produce } from 'immer';
 
-import { GameState, User, Coordinates } from '../types';
+import { GameState, Coordinates } from '../types';
 import { Action } from './actions';
 import {
   getNextPlayerID,
@@ -22,11 +22,14 @@ export const initState: GameState = {
 };
 
 type ContextAction = Action & {
-  context: { user: User },
+  context: {
+    playerID: string,
+    displayName: string,
+  },
 };
 
 export const reducer = produce((draft: GameState, action: ContextAction) => {
-  const { uid: playerID, displayName } = action.context.user;
+  const { playerID, displayName } = action.context;
 
   switch (action.type) {
     case 'join': {
@@ -83,6 +86,16 @@ export const reducer = produce((draft: GameState, action: ContextAction) => {
       }
 
       return;
+    }
+    case 'restart': {
+      draft.board = {};
+      draft.currentOrder = null;
+      draft.currentPlayer = null;
+      draft.gameover = false;
+      Object.keys(draft.players).forEach((pid) => {
+        draft.players[pid].captures = 0;
+      });
+      draft.started = false;
     }
   }
 });

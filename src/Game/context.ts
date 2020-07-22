@@ -4,7 +4,7 @@ import { GameState } from '../types';
 import { Action } from './actions';
 
 type Dispatch = (action: Action) => void;
-type GameContext = readonly [GameState, Dispatch];
+type GameContext = readonly [GameState, Dispatch, { playerID: string, displayName: string; }];
 
 export const GameContext = React.createContext<GameContext | null>(null);
 
@@ -22,4 +22,9 @@ export const useSelector = <T>(selector: (state: GameState, ...args: any[]) => T
 export const useDispatch = () => {
   const [, dispatch] = useContext();
   return dispatch;
+};
+
+export const usePlayer = () => {
+  const [, , player] = useContext();
+  return player;
 };

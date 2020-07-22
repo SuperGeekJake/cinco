@@ -21,10 +21,15 @@ export const quitGame = () => ({
   type: 'quit' as const,
 });
 
+export const restartGame = () => ({
+  type: 'restart' as const,
+});
+
 export type Action =
   | ReturnType<typeof joinGame>
   | ReturnType<typeof startGame>
   | ReturnType<typeof cancelGame>
   | ReturnType<typeof placeToken>
   | ReturnType<typeof quitGame>
-;
+  | ReturnType<typeof restartGame>
+  ;

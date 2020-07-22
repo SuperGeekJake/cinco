@@ -6,16 +6,15 @@ import { GameState, DocumentSnapshot } from '../types';
 import { playerColors } from '../styles';
 import Board from './Board';
 import Lobby from './Lobby';
-import { useSession } from '../session';
-import { useSelector } from './context';
+import { useSelector, usePlayer } from './context';
 
 type Game = DocumentSnapshot<GameState>;
 
 const Game: React.FC = () => {
-  const { uid: userID } = useSession();
+  const user = usePlayer();
 
   const players = useSelector(getPlayersByOrder);
-  const isUser = (id: string) => userID === id;
+  const isUser = (id: string) => user.playerID === id;
   const currentPlayer = useSelector(state => state.currentPlayer);
   const isCurrentPlayer = (id: string) => currentPlayer === id;
   const started = useSelector(state => state.started);
@@ -61,12 +60,12 @@ const StyledBoard = styled(Board)`
   grid-area: board;
 `;
 
-const PlayerContainer = styled.div<{ playerOrder: number }>`
+const PlayerContainer = styled.div<{ playerOrder: number; }>`
   grid-area: p${p => p.playerOrder};
   padding: 10px;
 `;
 
-const PlayerView = styled.div<{ isCurrentPlayer: boolean }>`
+const PlayerView = styled.div<{ isCurrentPlayer: boolean; }>`
   height: 0;
   padding-top: 100%;
   position: relative;
@@ -86,7 +85,7 @@ const PlayerContent = styled.div`
   align-items: center;
 `;
 
-const DisplayName = styled.div<{ playerOrder: number, isUser: boolean }>`
+const DisplayName = styled.div<{ playerOrder: number, isUser: boolean; }>`
   font-size: 20px;
   font-weight: bold;
   color: ${p => getPlayerColor(p.playerOrder)};
@@ -96,4 +95,4 @@ const getPlayerColor = (playerOrder: number) => {
   const color: string | undefined = playerColors[playerOrder];
   if (!color) throw new Error('Bad playerOrder provided');
   return color;
-}
+};

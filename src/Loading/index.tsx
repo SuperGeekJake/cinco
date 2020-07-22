@@ -1,7 +1,7 @@
 import * as React from 'react';
 
 type Props = {
-  error?: { message: string, code?: string } | null
+  error?: { message: string, code?: string; } | null;
 };
 
 const LoadingScreen: React.FC<Props> = ({ error }) => (

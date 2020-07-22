@@ -2,34 +2,35 @@ import * as React from 'react';
 import styled from '@emotion/styled';
 
 import { getTokenID } from './selectors';
-import { Coordinates } from '../types';
-import { useSelector } from './context';
+import { Coordinates, GameState } from '../types';
+import { useSelector, useDispatch } from './context';
 import Token from './Token';
+import { restartGame } from './actions';
 
 type Props = {
   className?: string,
 };
 
 const Board: React.FC<Props> = ({ className }) => {
-  const isGameover = useSelector(state => state.gameover);
   const currentPlayer = useSelector(state => state.currentPlayer);
   const players = useSelector(state => state.players);
-  const playOrder = useSelector(state => state.playerOrder);
+  const isVictory = useSelector(getIsVictory);
 
-  // const isVictory = isGameover && !!currentPlayer;
-  // const isPlayerLeft = state.gameover && !state.currentPlayer;
+  const dispatch = useDispatch();
+  const onRestartGame = () => { dispatch(restartGame()); };
+
   return (
     <Root className={className}>
       <TokenGrid>
-        {renderTokens((coord) => (
+        {boardArr.map((coord) => (
           <Token
             key={getTokenID(coord)}
             coord={coord}
           />
         ))}
       </TokenGrid>
-      {isVictory(isGameover, currentPlayer) && (
-        <Log>Player {playOrder.indexOf(currentPlayer) + 1} <em>"{players[currentPlayer].displayName}"</em> has won.</Log>
+      {isVictory && (
+        <Log><em>{players[currentPlayer as string].displayName}</em> has won. <button onClick={onRestartGame}>Restart</button></Log>
       )}
     </Root>
   );
@@ -38,13 +39,13 @@ const Board: React.FC<Props> = ({ className }) => {
 export default Board;
 
 const BOARD_SIZE = 19;
-const renderTokens = (mapFn: (coord: Coordinates) => React.ReactNode) =>
-  Array.from({ length: BOARD_SIZE }).map((_, x) =>
-    Array.from({ length: BOARD_SIZE }).map((_, y) => mapFn([x, y] as Coordinates))
-  );
+const boardArr = Array.from(
+  { length: Math.pow(BOARD_SIZE, 2) },
+  (_, index) => [Math.floor(index / BOARD_SIZE), index % BOARD_SIZE] as Coordinates
+);
 
-const isVictory = (isGameover: boolean, currentPlayer: string | null): currentPlayer is string =>
-  isGameover && !!currentPlayer;
+const getIsVictory = (state: GameState) =>
+  state.gameover && !!state.currentPlayer;
 
 const Root = styled.div`
   height: 0;
