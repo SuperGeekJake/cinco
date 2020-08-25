@@ -1,13 +1,15 @@
 import * as React from 'react';
+import { Action } from '@reduxjs/toolkit';
+import { useParams, Redirect } from 'react-router-dom';
 
 import firebase from '../firebase';
-import { reducer, initState } from './reducer';
-import { GameState, User } from '../types';
+import { User } from '../types';
 import { useSession } from '../session';
-import { useParams, Redirect } from 'react-router-dom';
 import LoadingScreen from '../Loading';
 import useStreamState from '../useStreamState';
-import { Action, joinGame } from './actions';
+
+import { State as GameState } from './types';
+import { reducer, actions } from './state';
 import Game from './Game';
 import { GameContext } from './context';
 
@@ -20,8 +22,8 @@ const ConnectedGame = () => {
   React.useEffect(() => {
     if (!gameID) {
       const ref = gamesCollection.doc();
-      const action = { ...joinGame(), context: { playerID: user.uid, displayName: user.displayName } };
-      ref.set(reducer(initState, action))
+      const action = actions.join({ userID: user.uid, displayName: user.displayName });
+      ref.set(reducer(undefined, action))
         .then(() => { setRedirect(ref.id); })
         .catch(onError)
         ;
@@ -35,17 +37,17 @@ const ConnectedGame = () => {
     const state = data.data();
     if (!state) return null;
 
-    const context = {
-      playerID: user.uid,
+    const player = {
+      uid: user.uid,
       displayName: user.displayName
     };
 
     const dispatch = (action: Action) => {
-      const contextAction = { ...action, context };
-      data.ref.update(reducer(state, contextAction));
+      data.ref.update(reducer(state, action));
+      return action;
     };
 
-    return [state, dispatch, context] as const;
+    return [state, dispatch, player] as const;
   }, [data, user]);
 
   if (redirect && gameID !== redirect) return <Redirect to={`/game/${redirect}`} />;

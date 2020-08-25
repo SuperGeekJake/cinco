@@ -1,21 +1,22 @@
 import * as React from 'react';
 
-import { getPlayersByOrder, getIsGameHost, getIsPlayer } from './selectors';
-import { startGame, cancelGame, quitGame, joinGame } from './actions';
+import { getIsGameHost, getIsPlayer } from './selectors';
 import { useDispatch, useSelector, usePlayer } from './context';
+import { actions } from './state';
 
 const Lobby: React.FC = () => {
   const user = usePlayer();
 
   const dispatch = useDispatch();
-  const onStartButton = () => { dispatch(startGame()); };
-  const onCancelButton = () => { dispatch(cancelGame()); };
-  const onLeaveButton = () => { dispatch(quitGame()); };
-  const onJoinButton = () => { dispatch(joinGame()); };
+  const onStartButton = () => { dispatch(actions.start()); };
+  const onCancelButton = () => { dispatch(actions.cancel()); };
+  const onLeaveButton = () => { dispatch(actions.end({ userID: user.uid })); };
+  const onJoinButton = () => { dispatch(actions.join({ userID: user.uid, displayName: user.displayName })); };
 
-  const players = useSelector(getPlayersByOrder);
-  const isGameHost = useSelector(getIsGameHost, user.playerID);
-  const isPlayer = useSelector(getIsPlayer, user.playerID);
+  const playOrder = useSelector(state => state.playOrder);
+  const players = useSelector(state => state.players);
+  const isGameHost = useSelector(getIsGameHost, user.uid);
+  const isPlayer = useSelector(getIsPlayer, user.uid);
   const gameover = useSelector(state => state.gameover);
 
   return (
@@ -27,15 +28,14 @@ const Lobby: React.FC = () => {
         <div>
           <h1>Lobby screen</h1>
           <ul>
-            {players.map(({ id, displayName }) => (
-              <li key={id} data-me={user.playerID === id}>{displayName}</li>
+            {playOrder.map((playerID) => (
+              <li key={playerID} data-me={user.uid === playerID}>{players[playerID]}</li>
             ))}
           </ul>
-          {players.length < 2 && <p>Waiting on players to join...</p>}
           <div>
             {isGameHost && (
               <ul>
-                <li><button disabled={players.length < 2} onClick={onStartButton}>Start Game</button></li>
+                <li><button disabled={playOrder.length < 2} onClick={onStartButton}>Start Game</button></li>
                 <li><button onClick={onCancelButton}>Cancel Game</button></li>
               </ul>
             )}
@@ -43,14 +43,14 @@ const Lobby: React.FC = () => {
               <>
                 {isPlayer && (
                   <>
-                    {players.length < 2 && <p>Waiting on players to join...</p>}
-                    {players.length > 1 && <p>Waiting on host to start game</p>}
+                    {playOrder.length < 2 && <p>Waiting on players to join...</p>}
+                    {playOrder.length > 1 && <p>Waiting on host to start game</p>}
                     <ul>
                       <li><button onClick={onLeaveButton}>Leave Game</button></li>
                     </ul>
                   </>
                 )}
-                {(!isPlayer && players.length < 4) && (
+                {(!isPlayer && playOrder.length < 4) && (
                   <u>
                     <li><button onClick={onJoinButton}>Join Game</button></li>
                   </u>

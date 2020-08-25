@@ -5,7 +5,8 @@ import styled from '@emotion/styled';
 import firebase from '../firebase';
 import useStreamState from '../useStreamState';
 import { useSession } from '../session';
-import { GameState, QuerySnapshot } from '../types';
+import { QuerySnapshot } from '../types';
+import { State as GameState } from '../Game/types';
 
 type Games = QuerySnapshot<GameState>;
 
@@ -69,7 +70,7 @@ const useGames = () => {
 
   React.useEffect(() => {
     // TODO: Fix this where()
-    db.collection('games').where(`users.${user.uid}`, '==', true).get()
+    db.collection('games').where(`players.${user.uid}`, '==', true).get()
       .then((games) => { onNext(games as Games); })
       .catch((error) => {
         console.error(error);

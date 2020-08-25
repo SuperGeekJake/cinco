@@ -1,25 +1,21 @@
 import * as React from 'react';
+import { Action } from '@reduxjs/toolkit';
 
-import { reducer, initState } from './reducer';
-import { GameState } from '../types';
-import { Action } from './actions';
+import { reducer, initialState } from './state';
+import { State } from './types';
 import Game from './Game';
 import { GameContext } from './context';
-import { getPlayersByOrder } from './selectors';
 import LoadingScreen from '../Loading';
 
 const LocalGame = () => {
-  const [state, setState] = React.useState<GameState | null>(null);
+  const [state, setState] = React.useState<State | null>(null);
 
   const context = React.useMemo(() => {
     if (!state) return;
-    const { id: playerID, displayName } = getPlayersByOrder(state)[state.currentOrder || 0];
-    const context = { playerID, displayName };
-    const dispatch = (action: Action) => {
-      setState(reducer(state, { ...action, context }));
-    };
-
-    return [state, dispatch, context] as const;
+    const dispatch = (action: Action) => { setState(reducer(state, action)); };
+    const currentPlayer = state.currentPlayer || 'localPlayer1';
+    const player = { uid: currentPlayer, displayName: state.players[currentPlayer] };
+    return [state, dispatch, player] as const;
   }, [state]);
 
   React.useEffect(() => {
@@ -44,19 +40,11 @@ export default LocalGame;
 
 const STORAGE_KEY = 'cinco.LocalGame';
 
-const localInitState = {
-  ...initState,
-  playerOrder: ['localPlayer1', 'localPlayer2'],
+const localInitState: State = {
+  ...initialState,
+  playOrder: ['localPlayer1', 'localPlayer2'],
   players: {
-    'localPlayer1': {
-      active: true,
-      displayName: 'Player 1',
-      captures: 0,
-    },
-    'localPlayer2': {
-      active: true,
-      displayName: 'Player 2',
-      captures: 0,
-    },
-  }
+    'localPlayer1': 'Player 1',
+    'localPlayer2': 'Player 2',
+  },
 };

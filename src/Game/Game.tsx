@@ -1,39 +1,50 @@
 import * as React from 'react';
 import styled from '@emotion/styled';
 
-import { getPlayersByOrder } from './selectors';
-import { GameState, DocumentSnapshot } from '../types';
+import { DocumentSnapshot } from '../types';
 import { playerColors } from '../styles';
+
+import { State } from './types';
 import Board from './Board';
 import Lobby from './Lobby';
 import { useSelector, usePlayer } from './context';
 
-type Game = DocumentSnapshot<GameState>;
+type Game = DocumentSnapshot<State>;
 
 const Game: React.FC = () => {
   const user = usePlayer();
 
-  const players = useSelector(getPlayersByOrder);
-  const isUser = (id: string) => user.playerID === id;
+  const playOrder = useSelector(state => state.playOrder);
+  const players = useSelector(state => state.players);
+  const captures = useSelector(state => state.captures);
   const currentPlayer = useSelector(state => state.currentPlayer);
-  const isCurrentPlayer = (id: string) => currentPlayer === id;
-  const started = useSelector(state => state.started);
+  const started = useSelector(state => state.status !== 'lobby' && state.status !== 'cancelled');
+
+  const isUser = React.useCallback((id: string) => user.uid === id, [user]);
+  const isCurrentPlayer = React.useCallback((id: string) => currentPlayer === id, [currentPlayer]);
+  const playerViews = React.useMemo(() => playOrder.map((id, index) => (
+    <PlayerContainer key={id} playerOrder={index}>
+      <PlayerView isCurrentPlayer={isCurrentPlayer(id)}>
+        <PlayerContent>
+          <DisplayName isUser={isUser(id)} playerOrder={index}>{players[id]}</DisplayName>
+          <div>Captures: {captures[id]}</div>
+        </PlayerContent>
+      </PlayerView>
+    </PlayerContainer>
+  )), [
+    isCurrentPlayer,
+    isUser,
+    captures,
+    players,
+    playOrder,
+  ]);
 
   return (
     <Root data-testid="gameScreen">
       {!started && <Lobby />}
       {started && (
         <React.Fragment>
-          {players.map(({ id, displayName, captures }, index) => (
-            <PlayerContainer key={id} playerOrder={index}>
-              <PlayerView isCurrentPlayer={isCurrentPlayer(id)}>
-                <PlayerContent>
-                  <DisplayName isUser={isUser(id)} playerOrder={index}>{displayName}</DisplayName>
-                  <div>Captures: {captures}</div>
-                </PlayerContent>
-              </PlayerView>
-            </PlayerContainer>
-          ))}
+          {playerViews}
           <StyledBoard />
         </React.Fragment>
       )}
