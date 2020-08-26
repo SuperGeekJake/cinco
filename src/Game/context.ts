@@ -1,10 +1,10 @@
 import * as React from 'react';
+import { Action } from '@reduxjs/toolkit';
 
-import { DerivedState } from '../types';
-import { Action } from './actions';
+import { State } from './types';
 
 type Dispatch = (action: Action) => void;
-type GameContext = readonly [DerivedState, Dispatch];
+type GameContext = readonly [State, Dispatch, { uid: string, displayName: string; }];
 
 export const GameContext = React.createContext<GameContext | null>(null);
 
@@ -14,7 +14,7 @@ const useContext = () => {
   return context;
 };
 
-export const useSelector = <T>(selector: (state: DerivedState, ...args: any[]) => T, ...args: any[]) => {
+export const useSelector = <T>(selector: (state: State, ...args: any[]) => T, ...args: any[]) => {
   const [state] = useContext();
   return selector(state, ...args);
 };
@@ -22,4 +22,9 @@ export const useSelector = <T>(selector: (state: DerivedState, ...args: any[]) =
 export const useDispatch = () => {
   const [, dispatch] = useContext();
   return dispatch;
+};
+
+export const usePlayer = () => {
+  const [, , player] = useContext();
+  return player;
 };

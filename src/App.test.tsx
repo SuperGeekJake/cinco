@@ -7,21 +7,21 @@ import { MemoryRouter } from 'react-router-dom';
 import { User } from './types';
 
 jest.mock('firebase/app', () => ({
-  initializeApp: () => {},
+  initializeApp: () => { },
   firestore: () => ({
     collection: () => ({
       doc: () => ({
         set: () => ({
           then: () => ({
-            catch: () => {},
+            catch: () => { },
           }),
         }),
-        onSnapshot: () => {},
+        onSnapshot: () => { },
       }),
       where: () => ({
         get: () => ({
           then: () => ({
-            catch: () => {},
+            catch: () => { },
           }),
         }),
       }),
@@ -70,7 +70,7 @@ const mockUser = ({ displayName: 'GamerTag' } as unknown) as User;
 const mockError = (new Error('Mock error message') as unknown) as firebase.auth.AuthError;
 const defaultSession: [['ready', firebase.User], jest.Mock] = [['ready', mockUser], jest.fn()];
 
-const MockContext = ({ session = defaultSession, history = ['/'], children }: { session?: ContextValue, history?: string[], children: React.ReactNode }) => (
+const MockContext = ({ session = defaultSession, history = ['/'], children }: { session?: ContextValue, history?: string[], children: React.ReactNode; }) => (
   <sessionContext.Provider value={session}>
     <MemoryRouter initialEntries={history}>
       {children}

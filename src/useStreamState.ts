@@ -13,7 +13,7 @@ type StreamState<D, E> = [
   () => void
 ];
 
-const defaultState: ['loading', null] = ['loading', null]
+const defaultState: ['loading', null] = ['loading', null];
 
 export default function useStreamState<D, E>(): StreamState<D, E> {
   const [state, setState] = React.useState<Stream<D, E>>(defaultState);

@@ -5,7 +5,7 @@ import { useForm } from 'react-hook-form';
 import { useSession, useSetSession } from '../session';
 
 export default function LoginScreen() {
-  const location = useLocation<{ from?: Location }>();
+  const location = useLocation<{ from?: Location; }>();
   const from = location.state?.from?.pathname || '/menu';
   const { register, handleSubmit, errors } = useForm();
   const user = useSession();
@@ -15,7 +15,7 @@ export default function LoginScreen() {
     user
       .updateProfile({ displayName })
       .then(() => {
-        setUser({ ...user, displayName })
+        setUser({ ...user, displayName });
       });
   };
   if (user.displayName) return <Redirect to={from} />;

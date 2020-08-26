@@ -1,50 +1,71 @@
 import * as React from 'react';
 import styled from '@emotion/styled';
 
-import { getCoordStr } from './selectors';
-import { Coordinates } from '../types';
-import { useSelector } from './context';
+import { TokenID } from './types';
+import { useDispatch, useSelector, usePlayer } from './context';
 import Token from './Token';
+import { actions } from './state';
 
 type Props = {
   className?: string,
 };
 
-const Board: React.FC<Props> = ({ className }) => {
-  const isGameover = useSelector(state => state.gameover);
-  const currentPlayer = useSelector(state => state.currentPlayer);
-  const players = useSelector(state => state.players);
-  const playOrder = useSelector(state => state.order);
+const BoardView: React.FC<Props> = ({ className }) => {
+  const user = usePlayer();
+  const dispatch = useDispatch();
 
-  // const isVictory = isGameover && !!currentPlayer;
-  // const isPlayerLeft = state.gameover && !state.currentPlayer;
+  const status = useSelector(state => state.status);
+  const currentPlayer = useSelector(state => state.currentPlayer as string);
+  const players = useSelector(state => state.players);
+  const board = useSelector(state => state.board);
+  const playOrder = useSelector(state => state.playOrder);
+
+  const isVictory = status === 'gameover';
+  const isBoardDisabled = status !== 'playing';
+  const isCurrentPlayer = currentPlayer === user.uid;
+
+  const onRestartGame = () => { dispatch(actions.restart()); };
+  const onSelectToken = React.useCallback(
+    (tokenID: TokenID) => { dispatch(actions.token({ tokenID, userID: user.uid })); },
+    [dispatch, user.uid]
+  );
+  const getTokenValue = React.useCallback((tokenID: TokenID) => {
+    const index = playOrder.indexOf(board[tokenID]);
+    return index !== -1 ? index : null;
+  }, [board, playOrder]);
+
+  const tokenGrid = React.useMemo(() => {
+    return boardArr.map((_, index) => (
+      <Token
+        key={index}
+        id={index}
+        value={getTokenValue(index)}
+        isGameover={isBoardDisabled}
+        isCurrentPlayer={isCurrentPlayer}
+        onSelect={onSelectToken}
+      />
+    ));
+  }, [
+    isCurrentPlayer,
+    onSelectToken,
+    isBoardDisabled,
+    getTokenValue,
+  ]);
+
   return (
     <Root className={className}>
-      <TokenGrid>
-        {renderTokens((coord) => (
-          <Token
-            key={getCoordStr(coord)}
-            coord={coord}
-          />
-        ))}
-      </TokenGrid>
-      {isVictory(isGameover, currentPlayer) && (
-        <Log>Player {playOrder.indexOf(currentPlayer) + 1} <em>"{players[currentPlayer].displayName}"</em> has won.</Log>
+      <TokenGrid>{tokenGrid}</TokenGrid>
+      {isVictory && (
+        <Log><em>{players[currentPlayer]}</em> has won. <button onClick={onRestartGame}>Restart</button></Log>
       )}
     </Root>
   );
 };
 
-export default Board;
+export default BoardView;
 
 const BOARD_SIZE = 19;
-const renderTokens = (mapFn: (coord: Coordinates) => React.ReactNode) =>
-  Array.from({ length: BOARD_SIZE }).map((_, x) =>
-    Array.from({ length: BOARD_SIZE }).map((_, y) => mapFn([x, y] as Coordinates))
-  );
-
-const isVictory = (isGameover: boolean, currentPlayer: string | null): currentPlayer is string =>
-  isGameover && !!currentPlayer;
+const boardArr = Array.from({ length: Math.pow(BOARD_SIZE, 2) });
 
 const Root = styled.div`
   height: 0;

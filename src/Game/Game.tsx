@@ -1,40 +1,50 @@
 import * as React from 'react';
 import styled from '@emotion/styled';
 
-import { getPlayersByOrder } from './selectors';
-import { DerivedState, DocumentSnapshot, Order } from '../types';
+import { DocumentSnapshot } from '../types';
 import { playerColors } from '../styles';
+
+import { State } from './types';
 import Board from './Board';
 import Lobby from './Lobby';
-import { useSession } from '../session';
-import { useSelector } from './context';
+import { useSelector, usePlayer } from './context';
 
-type Game = DocumentSnapshot<DerivedState>;
+type Game = DocumentSnapshot<State>;
 
 const Game: React.FC = () => {
-  const { uid: userID } = useSession();
+  const user = usePlayer();
 
-  const players = useSelector(getPlayersByOrder);
-  const isUser = (id: string) => userID === id;
+  const playOrder = useSelector(state => state.playOrder);
+  const players = useSelector(state => state.players);
+  const captures = useSelector(state => state.captures);
   const currentPlayer = useSelector(state => state.currentPlayer);
-  const isCurrentPlayer = (id: string) => currentPlayer === id;
-  const started = useSelector(state => state.started);
+  const started = useSelector(state => state.status !== 'lobby' && state.status !== 'cancelled');
+
+  const isUser = React.useCallback((id: string) => user.uid === id, [user]);
+  const isCurrentPlayer = React.useCallback((id: string) => currentPlayer === id, [currentPlayer]);
+  const playerViews = React.useMemo(() => playOrder.map((id, index) => (
+    <PlayerContainer key={id} playerOrder={index}>
+      <PlayerView isCurrentPlayer={isCurrentPlayer(id)}>
+        <PlayerContent>
+          <DisplayName isUser={isUser(id)} playerOrder={index}>{players[id]}</DisplayName>
+          <div>Captures: {captures[id]}</div>
+        </PlayerContent>
+      </PlayerView>
+    </PlayerContainer>
+  )), [
+    isCurrentPlayer,
+    isUser,
+    captures,
+    players,
+    playOrder,
+  ]);
 
   return (
     <Root data-testid="gameScreen">
       {!started && <Lobby />}
       {started && (
         <React.Fragment>
-          {players.map(({ id, displayName, captures }, index) => (
-            <PlayerContainer key={id} playerOrder={index}>
-              <PlayerView isCurrentPlayer={isCurrentPlayer(id)}>
-                <PlayerContent>
-                  <DisplayName isUser={isUser(id)} playerOrder={index as Order}>{displayName}</DisplayName>
-                  <div>Captures: {captures}</div>
-                </PlayerContent>
-              </PlayerView>
-            </PlayerContainer>
-          ))}
+          {playerViews}
           <StyledBoard />
         </React.Fragment>
       )}
@@ -61,12 +71,12 @@ const StyledBoard = styled(Board)`
   grid-area: board;
 `;
 
-const PlayerContainer = styled.div<{ playerOrder: number }>`
+const PlayerContainer = styled.div<{ playerOrder: number; }>`
   grid-area: p${p => p.playerOrder};
   padding: 10px;
 `;
 
-const PlayerView = styled.div<{ isCurrentPlayer: boolean }>`
+const PlayerView = styled.div<{ isCurrentPlayer: boolean; }>`
   height: 0;
   padding-top: 100%;
   position: relative;
@@ -86,8 +96,14 @@ const PlayerContent = styled.div`
   align-items: center;
 `;
 
-const DisplayName = styled.div<{ playerOrder: Order, isUser: boolean }>`
+const DisplayName = styled.div<{ playerOrder: number, isUser: boolean; }>`
   font-size: 20px;
   font-weight: bold;
-  color: ${p => playerColors[p.playerOrder]};
+  color: ${p => getPlayerColor(p.playerOrder)};
 `;
+
+const getPlayerColor = (playerOrder: number) => {
+  const color: string | undefined = playerColors[playerOrder];
+  if (!color) throw new Error('Bad playerOrder provided');
+  return color;
+};
