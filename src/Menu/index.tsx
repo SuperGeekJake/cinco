@@ -1,7 +1,7 @@
 import * as React from 'react';
 import { Switch, Route, Link, useRouteMatch } from 'react-router-dom';
-import styled from '@emotion/styled';
 
+import styled from '../styles';
 import firebase from '../firebase';
 import useStreamState from '../useStreamState';
 import { useSession } from '../session';

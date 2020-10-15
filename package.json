@@ -14,6 +14,7 @@
     "@types/react": "^16.9.47",
     "@types/react-dom": "^16.9.0",
     "@types/react-router-dom": "^5.1.5",
+    "emotion-theming": "^10.0.27",
     "firebase": "^7.19.0",
     "mutationobserver-shim": "^0.3.7",
     "normalize.css": "^8.0.1",

@@ -1,9 +1,7 @@
 import * as React from 'react';
-import styled from '@emotion/styled';
 
+import styled from '../styles';
 import { DocumentSnapshot } from '../types';
-import { playerColors } from '../styles';
-
 import { State } from './types';
 import Board from './Board';
 import Lobby from './Lobby';
@@ -99,11 +97,5 @@ const PlayerContent = styled.div`
 const DisplayName = styled.div<{ playerOrder: number, isUser: boolean; }>`
   font-size: 20px;
   font-weight: bold;
-  color: ${p => getPlayerColor(p.playerOrder)};
+  color: ${p => p.theme.colors[`player${p.playerOrder}`]}
 `;
-
-const getPlayerColor = (playerOrder: number) => {
-  const color: string | undefined = playerColors[playerOrder];
-  if (!color) throw new Error('Bad playerOrder provided');
-  return color;
-};

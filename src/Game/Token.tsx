@@ -1,8 +1,7 @@
 import * as React from 'react';
-import styled from '@emotion/styled';
 import { css } from '@emotion/core';
 
-import { playerColors } from '../styles';
+import styled from '../styles';
 import { TokenID } from './types';
 
 type Props = {
@@ -54,14 +53,14 @@ const Root = styled.button<{ disabled: boolean; }>`
 const Inside = styled.div<{ active: number | null; }>`
   height: 100%;
   border: 1px solid #ddd;
-  background: #fff;
+  background: ${p => p.theme.colors.background};
   box-shadow: inset 0 1px 5px rgba(0, 0, 0, 0.2);
   border-radius: 4px;
   transition: background-color 0.3s;
 
   ${p => p.active !== null && css`
     border: none;
-    background: ${playerColors[p.active as 0 | 1 | 2 | 3]};
+    background: ${p.theme.colors[`player${p.active}`]};
     box-shadow: 0 1px 4px rgba(0, 0, 0, 0.1);
   `}
 `;

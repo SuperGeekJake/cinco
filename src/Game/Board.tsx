@@ -1,6 +1,6 @@
 import * as React from 'react';
-import styled from '@emotion/styled';
 
+import styled from '../styles';
 import { TokenID } from './types';
 import { useDispatch, useSelector, usePlayer } from './context';
 import Token from './Token';
