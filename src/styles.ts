@@ -1,13 +1,7 @@
 import { css } from '@emotion/core';
 import styled, { CreateStyled } from '@emotion/styled';
 
-export type Theme = {
-  space: number[],
-  fontSizes: number[],
-  colors: Record<string, string>,
-};
-
-export const theme: Theme = {
+export const theme = {
   space: [0, 5, 15, 30],
   fontSizes: [14, 16, 20, 26, 32],
   colors: {
@@ -19,6 +13,8 @@ export const theme: Theme = {
     player3: '#8fd5a6',
   },
 };
+
+export type Theme = typeof theme;
 
 export const globalStyles = (theme: Theme) => css`
   *, *:before, *:after {
