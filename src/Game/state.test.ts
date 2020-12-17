@@ -1,5 +1,5 @@
 import { reducer, actions, initialState } from './state';
-import { State } from './types';
+import { IState } from './types';
 
 test('check for a capture', () => {
   const state = {
@@ -93,7 +93,7 @@ describe('check for victory', () => {
   });
 });
 
-const testState: State = {
+const testState: IState = {
   ...initialState,
   playOrder: ['red', 'blue'],
   players: {
@@ -102,5 +102,4 @@ const testState: State = {
   },
 };
 
-// const mockPlayer = { playerID: 'blue', displayName: 'Player Blue' };
 const getCoordIndex = (x: number, y: number) => (x * 19) + y;

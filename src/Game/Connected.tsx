@@ -3,20 +3,20 @@ import { Action } from '@reduxjs/toolkit';
 import { useParams, Redirect } from 'react-router-dom';
 
 import firebase from '../firebase';
-import { User } from '../types';
+import { IUser } from '../types';
 import { useSession } from '../session';
 import LoadingScreen from '../Loading';
 import useStreamState from '../useStreamState';
 
-import { State as GameState } from './types';
+import { IState as GameState, TGame as GameType } from './types';
 import { reducer, actions } from './state';
 import Game from './Game';
 import { GameContext } from './context';
 
 const ConnectedGame = () => {
   const { id: gameID } = useParams<{ id?: string; }>();
-  const [[state, data], onNext, onError] = useStreamState<Game, Error>();
-  const user = useSession() as User;
+  const [[state, data], onNext, onError] = useStreamState<GameType, Error>();
+  const user = useSession() as IUser;
   const [redirect, setRedirect] = React.useState<string | null>(null);
 
   React.useEffect(() => {

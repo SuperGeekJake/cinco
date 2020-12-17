@@ -1,13 +1,9 @@
 import * as React from 'react';
 
-import styled from '../styles';
-import { DocumentSnapshot } from '../types';
-import { State } from './types';
+import styled, { TTheme } from '../styles';
 import Board from './Board';
 import Lobby from './Lobby';
 import { useSelector, usePlayer } from './context';
-
-type Game = DocumentSnapshot<State>;
 
 const Game: React.FC = () => {
   const user = usePlayer();
@@ -97,5 +93,5 @@ const PlayerContent = styled.div`
 const DisplayName = styled.div<{ playerOrder: number, isUser: boolean; }>`
   font-size: 20px;
   font-weight: bold;
-  color: ${p => p.theme.colors[`player${p.playerOrder}`]}
+  color: ${p => p.theme.colors[`player${p.playerOrder}` as keyof TTheme['colors']]}
 `;

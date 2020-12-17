@@ -5,10 +5,10 @@ import styled from '../styles';
 import firebase from '../firebase';
 import useStreamState from '../useStreamState';
 import { useSession } from '../session';
-import { QuerySnapshot } from '../types';
-import { State as GameState } from '../Game/types';
+import { IQuerySnapshot } from '../types';
+import { IState as IGameState } from '../Game/types';
 
-type Games = QuerySnapshot<GameState>;
+type TGames = IQuerySnapshot<IGameState>;
 
 const db = firebase.firestore();
 
@@ -37,10 +37,10 @@ const MenuScreen: React.FC = () => {
             {state === 'loading' && <p>...</p>}
             {state === 'ready' && (
               <>
-                {(data as Games).empty && <p>No games found.</p>}
-                {!(data as Games).empty && (
+                {(data as TGames).empty && <p>No games found.</p>}
+                {!(data as TGames).empty && (
                   <ul>
-                    {(data as Games).docs.map(({ id }) => (
+                    {(data as TGames).docs.map(({ id }) => (
                       <li key={id}>
                         <MenuItem to={`/game/${id}`}>{id}</MenuItem>
                       </li>
@@ -66,12 +66,12 @@ const MenuItem = Link;
 
 const useGames = () => {
   const user = useSession();
-  const [state, onNext, onError] = useStreamState<Games, Error>();
+  const [state, onNext, onError] = useStreamState<TGames, Error>();
 
   React.useEffect(() => {
     db.collection('games').where(`players.${user.uid}`, '>', '').get()
       .then((games) => {
-        onNext(games as Games);
+        onNext(games as TGames);
       })
       .catch((error) => {
         console.error(error);

@@ -1,13 +1,13 @@
-import { UserID } from '../types';
-import { State as GameState, TokenID } from './types';
+import { IUserID } from '../types';
+import { IState as IGameState, TTokenID } from './types';
 
-export const getTokenValue = (state: GameState, id: TokenID): UserID | undefined => state.board[id];
+export const getTokenValue = (state: IGameState, id: TTokenID): IUserID | undefined => state.board[id];
 
-export const getNextPlayer = (state: GameState) =>
+export const getNextPlayer = (state: IGameState) =>
   state.playOrder[(state.playOrder.indexOf(state.currentPlayer || '') + 1) % state.playOrder.length];
 
-export const getIsCurrentPlayer = (state: GameState, playerID: string) =>
+export const getIsCurrentPlayer = (state: IGameState, playerID: string) =>
   playerID === state.currentPlayer;
 
-export const getIsGameHost = (state: GameState, playerID: string) => state.playOrder[0] === playerID;
-export const getIsPlayer = (state: GameState, userID: string) => !!state.players[userID];
+export const getIsGameHost = (state: IGameState, playerID: string) => state.playOrder[0] === playerID;
+export const getIsPlayer = (state: IGameState, userID: string) => !!state.players[userID];

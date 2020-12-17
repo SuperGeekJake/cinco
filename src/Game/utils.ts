@@ -1,5 +1,5 @@
-import { State, TokenID } from './types';
-import { UserID } from '../types';
+import { IState, TTokenID } from './types';
+import { IUserID } from '../types';
 
 // For amount in-a-row or number of captures
 export const VICTORY_COUNT = 5;
@@ -10,14 +10,14 @@ const START_INDEX = -FINAL_INDEX;
 
 const DIRECTIONS = [-20, -19, -18, -1] as const;
 
-const getAdjancentTokenID = (state: State, tokenID: TokenID, direction: number, position: number) =>
+const getAdjancentTokenID = (state: IState, tokenID: TTokenID, direction: number, position: number) =>
   tokenID + DIRECTIONS[direction] * position;
-const getAdjancentToken = (state: State, tokenID: TokenID) => (direction: number) => (position: number) =>
+const getAdjancentToken = (state: IState, tokenID: TTokenID) => (direction: number) => (position: number) =>
   state.board[getAdjancentTokenID(state, tokenID, direction, position)];
 
 type Getter = ReturnType<ReturnType<typeof getAdjancentToken>>;
 
-const isRowVictory = (getter: Getter, playerID: UserID) => {
+const isRowVictory = (getter: Getter, playerID: IUserID) => {
   let count = 0;
   let position = START_INDEX;
   while (true) {
@@ -28,7 +28,7 @@ const isRowVictory = (getter: Getter, playerID: UserID) => {
   }
 };
 
-export const hasRowVictory = (state: State, playerID: UserID, tokenID: TokenID) => {
+export const hasRowVictory = (state: IState, playerID: IUserID, tokenID: TTokenID) => {
   let victory = false;
   const getTokenForDirection = getAdjancentToken(state, tokenID);
   // Check for 5-in-a-row's or captures
@@ -42,14 +42,14 @@ export const hasRowVictory = (state: State, playerID: UserID, tokenID: TokenID) 
   return victory;
 };
 
-const isCapture = (getter: Getter, playerID: UserID, rowDirection: 1 | -1) =>
-  (
-    (!!getter(1 * rowDirection) && getter(1 * rowDirection) !== playerID)
-    && (!!getter(2 * rowDirection) && getter(2 * rowDirection) !== playerID)
-    && getter(3 * rowDirection) === playerID
-  );
+const isCapture = (getter: Getter, playerID: IUserID, rowDirection: 1 | -1) =>
+(
+  (!!getter(1 * rowDirection) && getter(1 * rowDirection) !== playerID)
+  && (!!getter(2 * rowDirection) && getter(2 * rowDirection) !== playerID)
+  && getter(3 * rowDirection) === playerID
+);
 
-export const getCaptures = (state: State, playerID: UserID, tokenID: TokenID) => {
+export const getCaptures = (state: IState, playerID: IUserID, tokenID: TTokenID) => {
   const captures: [number, number][] = [];
   const getTokenForDirection = getAdjancentToken(state, tokenID);
 

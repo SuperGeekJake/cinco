@@ -1,13 +1,7 @@
 import { css } from '@emotion/core';
 import styled, { CreateStyled } from '@emotion/styled';
 
-export type Theme = {
-  space: number[],
-  fontSizes: number[],
-  colors: Record<string, string>,
-};
-
-export const theme: Theme = {
+export const theme = {
   space: [0, 5, 15, 30],
   fontSizes: [14, 16, 20, 26, 32],
   colors: {
@@ -20,7 +14,9 @@ export const theme: Theme = {
   },
 };
 
-export const globalStyles = (theme: Theme) => css`
+export type TTheme = typeof theme;
+
+export const globalStyles = (theme: TTheme) => css`
   *, *:before, *:after {
     box-sizing: inherit;
   }
@@ -40,4 +36,4 @@ export const globalStyles = (theme: Theme) => css`
   }
 `;
 
-export default styled as CreateStyled<Theme>;
+export default styled as CreateStyled<TTheme>;

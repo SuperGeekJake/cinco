@@ -1,12 +1,12 @@
 import * as React from 'react';
 import { Action } from '@reduxjs/toolkit';
 
-import { State } from './types';
+import { IState } from './types';
 
-type Dispatch = (action: Action) => void;
-type GameContext = readonly [State, Dispatch, { uid: string, displayName: string; }];
+type TDispatch = (action: Action) => void;
+type TGameContext = readonly [IState, TDispatch, { uid: string, displayName: string; }];
 
-export const GameContext = React.createContext<GameContext | null>(null);
+export const GameContext = React.createContext<TGameContext | null>(null);
 
 const useContext = () => {
   const context = React.useContext(GameContext);
@@ -14,7 +14,7 @@ const useContext = () => {
   return context;
 };
 
-export const useSelector = <T>(selector: (state: State, ...args: any[]) => T, ...args: any[]) => {
+export const useSelector = <T>(selector: (state: IState, ...args: any[]) => T, ...args: any[]) => {
   const [state] = useContext();
   return selector(state, ...args);
 };

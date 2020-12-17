@@ -1,19 +1,19 @@
 import * as React from 'react';
 import { css } from '@emotion/core';
 
-import styled from '../styles';
-import { TokenID } from './types';
+import styled, { TTheme } from '../styles';
+import { TTokenID } from './types';
 
-type Props = {
+interface IProps {
   id: number,
   value: number | null,
   style?: any,
   isGameover: boolean,
   isCurrentPlayer: boolean,
-  onSelect: (tokenID: TokenID) => void,
+  onSelect: (tokenID: TTokenID) => void,
 };
 
-const Token: React.FC<Props> = ({
+const Token: React.FC<IProps> = ({
   id,
   value,
   style,
@@ -60,7 +60,7 @@ const Inside = styled.div<{ active: number | null; }>`
 
   ${p => p.active !== null && css`
     border: none;
-    background: ${p.theme.colors[`player${p.active}`]};
+    background: ${p.theme.colors[`player${p.active}` as keyof TTheme['colors']]};
     box-shadow: 0 1px 4px rgba(0, 0, 0, 0.1);
   `}
 `;

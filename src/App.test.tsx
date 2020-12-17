@@ -2,9 +2,9 @@ import * as React from 'react';
 import { render } from '@testing-library/react';
 
 import App from './App';
-import { sessionContext, ContextValue } from './session';
+import { sessionContext, TContextValue } from './session';
 import { MemoryRouter } from 'react-router-dom';
-import { User } from './types';
+import { IUser } from './types';
 
 jest.mock('firebase/app', () => ({
   initializeApp: () => { },
@@ -66,11 +66,11 @@ describe('renders correct route view', () => {
   // });
 });
 
-const mockUser = ({ displayName: 'GamerTag' } as unknown) as User;
+const mockUser = ({ displayName: 'GamerTag' } as unknown) as IUser;
 const mockError = (new Error('Mock error message') as unknown) as firebase.auth.AuthError;
 const defaultSession: [['ready', firebase.User], jest.Mock] = [['ready', mockUser], jest.fn()];
 
-const MockContext = ({ session = defaultSession, history = ['/'], children }: { session?: ContextValue, history?: string[], children: React.ReactNode; }) => (
+const MockContext = ({ session = defaultSession, history = ['/'], children }: { session?: TContextValue, history?: string[], children: React.ReactNode; }) => (
   <sessionContext.Provider value={session}>
     <MemoryRouter initialEntries={history}>
       {children}

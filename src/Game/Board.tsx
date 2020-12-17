@@ -1,7 +1,7 @@
 import * as React from 'react';
 
 import styled from '../styles';
-import { TokenID } from './types';
+import { TTokenID } from './types';
 import { useDispatch, useSelector, usePlayer } from './context';
 import Token from './Token';
 import { actions } from './state';
@@ -26,10 +26,10 @@ const BoardView: React.FC<Props> = ({ className }) => {
 
   const onRestartGame = () => { dispatch(actions.restart()); };
   const onSelectToken = React.useCallback(
-    (tokenID: TokenID) => { dispatch(actions.token({ tokenID, userID: user.uid })); },
+    (tokenID: TTokenID) => { dispatch(actions.token({ tokenID, userID: user.uid })); },
     [dispatch, user.uid]
   );
-  const getTokenValue = React.useCallback((tokenID: TokenID) => {
+  const getTokenValue = React.useCallback((tokenID: TTokenID) => {
     const index = playOrder.indexOf(board[tokenID]);
     return index !== -1 ? index : null;
   }, [board, playOrder]);

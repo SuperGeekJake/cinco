@@ -1,10 +1,10 @@
 import { createSlice, PayloadAction } from '@reduxjs/toolkit';
 import { getNextPlayer } from './selectors';
-import { State, TokenID } from './types';
-import { UserID, DisplayName } from '../types';
+import { IState, TTokenID } from './types';
+import { IUserID, IDisplayName } from '../types';
 import { getCaptures, hasRowVictory, VICTORY_COUNT } from './utils';
 
-export const initialState: State = {
+export const initialState: IState = {
   board: {},
   captures: {},
   currentPlayer: null,
@@ -23,11 +23,11 @@ export const {
   name: 'game',
   initialState,
   reducers: {
-    join: (state, { payload: { userID, displayName } }: PayloadAction<{ userID: UserID, displayName: DisplayName; }>) => {
+    join: (state, { payload: { userID, displayName } }: PayloadAction<{ userID: IUserID, displayName: IDisplayName; }>) => {
       state.playOrder.push(userID);
       state.players[userID] = displayName;
     },
-    leave: (state, { payload: { userID } }: PayloadAction<{ userID: UserID; }>) => {
+    leave: (state, { payload: { userID } }: PayloadAction<{ userID: IUserID; }>) => {
       const playerOrder = state.playOrder.indexOf(userID);
       state.playOrder.splice(playerOrder, 1);
       delete state.players[userID];
@@ -40,7 +40,7 @@ export const {
     cancel: (state) => {
       state.status = 'cancelled';
     },
-    token: (state, { payload: { tokenID, userID } }: PayloadAction<{ userID: UserID, tokenID: TokenID, }>) => {
+    token: (state, { payload: { tokenID, userID } }: PayloadAction<{ userID: IUserID, tokenID: TTokenID, }>) => {
       // Set token on board
       state.board[tokenID] = userID;
 
@@ -62,7 +62,7 @@ export const {
         state.currentPlayer = getNextPlayer(state);
       }
     },
-    end: (state, { payload: { userID } }: PayloadAction<{ userID: UserID; }>) => {
+    end: (state, { payload: { userID } }: PayloadAction<{ userID: IUserID; }>) => {
       state.status = 'ended';
       state.gameover = userID;
     },

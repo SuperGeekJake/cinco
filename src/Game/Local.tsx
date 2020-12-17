@@ -2,13 +2,13 @@ import * as React from 'react';
 import { Action } from '@reduxjs/toolkit';
 
 import { reducer, initialState } from './state';
-import { State } from './types';
+import { IState } from './types';
 import Game from './Game';
 import { GameContext } from './context';
 import LoadingScreen from '../Loading';
 
 const LocalGame = () => {
-  const [state, setState] = React.useState<State | null>(null);
+  const [state, setState] = React.useState<IState | null>(null);
 
   const context = React.useMemo(() => {
     if (!state) return;
@@ -40,7 +40,7 @@ export default LocalGame;
 
 const STORAGE_KEY = 'cinco.LocalGame';
 
-const localInitState: State = {
+const localInitState: IState = {
   ...initialState,
   playOrder: ['localPlayer1', 'localPlayer2'],
   players: {

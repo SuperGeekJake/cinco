@@ -1,13 +1,13 @@
 import * as React from 'react';
 
-export type Stream<D, E = Error> =
+export type TStream<D, E = Error> =
   | ['loading', null]
   | ['ready', D]
   | ['error', E]
   ;
 
-type StreamState<D, E> = [
-  Stream<D, E>,
+type TStreamState<D, E> = [
+  TStream<D, E>,
   (data: D) => void,
   (error: E) => void,
   () => void
@@ -15,8 +15,8 @@ type StreamState<D, E> = [
 
 const defaultState: ['loading', null] = ['loading', null];
 
-export default function useStreamState<D, E>(): StreamState<D, E> {
-  const [state, setState] = React.useState<Stream<D, E>>(defaultState);
+export default function useStreamState<D, E>(): TStreamState<D, E> {
+  const [state, setState] = React.useState<TStream<D, E>>(defaultState);
   const handleNext = React.useCallback((data: D) => { setState(['ready', data]); }, []);
   const handleError = React.useCallback((error: E) => { setState(['error', error]); }, []);
   const handleReset = React.useCallback(() => { setState(defaultState); }, []);
