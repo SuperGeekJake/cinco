@@ -69,9 +69,10 @@ const useGames = () => {
   const [state, onNext, onError] = useStreamState<Games, Error>();
 
   React.useEffect(() => {
-    // TODO: Fix this where()
-    db.collection('games').where(`players.${user.uid}`, '==', true).get()
-      .then((games) => { onNext(games as Games); })
+    db.collection('games').where(`players.${user.uid}`, '>', '').get()
+      .then((games) => {
+        onNext(games as Games);
+      })
       .catch((error) => {
         console.error(error);
         onError(error);
