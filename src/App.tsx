@@ -6,7 +6,7 @@ import {
   For,
   Show,
 } from "solid-js";
-// import createPanZoom from "panzoom";
+import createPanZoom from "panzoom";
 
 import { PlayerID, TokenID, MAX_TOKENS, INIT_STATE, createGame } from "./game";
 
@@ -88,34 +88,32 @@ export const App: Component = () => {
     return state.currentPlayer;
   }, state.currentPlayer);
 
-  // createEffect(() => {
-  //   const panzoom = createPanZoom(boardElement, {
-  //     bounds: true,
-  //     boundsPadding: 1,
-  //     maxZoom: 4,
-  //     minZoom: 1,
-  //   });
+  createEffect(() => {
+    const panzoom = createPanZoom(boardElement, {
+      bounds: true,
+      boundsPadding: 1,
+      maxZoom: 4,
+      minZoom: 1,
+      zoomSpeed: 0.4,
+    });
 
-  //   panzoom.on("panstart", () => {
-  //     isTransforming = true;
-  //   });
+    panzoom.on("panstart", () => {
+      isTransforming = true;
+    });
 
-  //   panzoom.on("panend", () => {
-  //     isTransforming = false;
-  //   });
+    panzoom.on("panend", () => {
+      isTransforming = false;
+    });
 
-  //   return () => {
-  //     panzoom.dispose();
-  //   };
-  // });
+    return () => {
+      panzoom.dispose();
+    };
+  });
 
   return (
     <main class="grid grid-cols-6 h-screen">
-      <div class="col-span-full lg:col-span-4 order-2 flex">
-        <div
-          ref={boardElement}
-          class="grid grid-cols-19 gap-1 w-full max-w-4xl p-1 m-auto"
-        >
+      <div class="col-span-full lg:col-span-4 order-2 aspect-square w-full max-w-4xl">
+        <div ref={boardElement} class="grid grid-cols-19 gap-1 p-1">
           <For each={board}>
             {(tokenID) => (
               <button
