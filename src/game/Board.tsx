@@ -1,7 +1,7 @@
 import { Component, createEffect, For } from "solid-js";
 import createPanZoom from "panzoom";
 
-import { TokenID, board } from "./game";
+import { TokenID, board } from "./state";
 
 export const Board: Component<{
   tokens: Record<TokenID, number>;

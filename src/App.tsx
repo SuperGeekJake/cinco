@@ -1,55 +1,16 @@
-import { Component, For, Show } from "solid-js";
+import { type Component } from "solid-js";
+import { Router, Routes, Route } from "@solidjs/router";
 
-import { INIT_STATE, createGame } from "./game";
-import { Board } from "./Board";
-import { CPU_ID } from "./ai";
+import { Game } from "./game";
+import { Home } from "./home";
 
 export const App: Component = () => {
-  const { state, tokenPlaced, startedGame, resettedGame } = createGame({
-    ...INIT_STATE,
-    playOrder: [CLIENT_ID, CLIENT_ID2],
-  });
-
   return (
-    <main class="grid grid-cols-6 h-screen">
-      <div class="col-span-full lg:col-span-4 order-2 aspect-square w-full max-w-4xl">
-        <Board
-          tokens={state.tokens}
-          active={state.status === "LIVE"}
-          onPlaceToken={tokenPlaced}
-        />
-      </div>
-      <For each={state.playOrder}>
-        {(playerID, getIndex) => (
-          <div
-            class={`col-span-3 lg:col-span-1 order-1 ${
-              getIndex() % 2 === 0 ? "lg:order-1" : "lg:order-3"
-            }`}
-          >
-            <div>{nameMessages[playerID]}</div>
-            <Show when={state.status !== "PRE"}>
-              <div>Captures: {state.captures[playerID]}</div>
-            </Show>
-          </div>
-        )}
-      </For>
-      <div class="col-span-6 order-last">
-        <button onClick={startedGame} disabled={state.status !== "PRE"}>
-          Start
-        </button>
-        <button onClick={resettedGame} disabled={state.status === "PRE"}>
-          Reset
-        </button>
-      </div>
-    </main>
+    <Router>
+      <Routes>
+        <Route path="/game/:id" component={Game} />
+        <Route path="/" component={Home} />
+      </Routes>
+    </Router>
   );
-};
-
-const CLIENT_ID = "__PLAYER_01__";
-const CLIENT_ID2 = "__PLAYER_02__";
-
-const nameMessages = {
-  [CLIENT_ID]: "Player 1",
-  [CLIENT_ID2]: "Player 2",
-  [CPU_ID]: "Computer 2",
 };

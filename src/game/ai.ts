@@ -1,6 +1,6 @@
 import { createMemo, createEffect, onCleanup } from "solid-js";
 
-import { type TokenID, type State, board } from "./game";
+import { type TokenID, type State, board } from "./state";
 
 export const createAi = (
   state: State,

@@ -1,4 +1,4 @@
-import { createGame, INIT_STATE } from "./game";
+import { createGame, INIT_STATE } from "./state";
 
 describe("createGame", () => {
   test("returns the default state if none is provided", () => {
