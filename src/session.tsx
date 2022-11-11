@@ -4,6 +4,7 @@ import {
   type Resource,
   createResource,
   createContext,
+  useContext,
 } from "solid-js";
 import { type Session } from "@supabase/supabase-js";
 
@@ -25,4 +26,13 @@ export const SessionProvider: Component<{ children: JSX.Element }> = (
       {props.children}
     </SessionContext.Provider>
   );
+};
+
+export const useSession = () => {
+  const result = useContext(SessionContext);
+  if (result === undefined) {
+    throw new Error("useSession must be used within a SessionProvider");
+  }
+
+  return result;
 };
