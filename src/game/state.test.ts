@@ -1,4 +1,4 @@
-import { createGame, INIT_STATE } from "./state";
+import { describe, test, expect } from "vitest";
 
 describe("createGame", () => {
   test("returns the default state if none is provided", () => {
