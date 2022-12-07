@@ -15,11 +15,18 @@ export const SessionContext = createContext<Resource<Session | null>>();
 export const SessionProvider: Component<{ children: JSX.Element }> = (
   props
 ) => {
-  const [session] = createResource(async () => {
+  const [session, { mutate }] = createResource(async () => {
     const { data, error } = await supabase.auth.getSession();
     if (error) throw error;
+    registerAuthListener();
     return data.session;
   });
+
+  function registerAuthListener() {
+    supabase.auth.onAuthStateChange((_, session) => {
+      mutate(session);
+    });
+  }
 
   return (
     <SessionContext.Provider value={session}>
