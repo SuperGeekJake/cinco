@@ -3,7 +3,7 @@ import { Router, Routes, Route } from "@solidjs/router";
 
 import { SessionProvider } from "./session";
 import { AuthGuard } from "./auth";
-import { Game, Create } from "./game";
+import { Game, Create, getGameData } from "./game";
 import { Home } from "./home";
 
 export const App: Component = () => {
@@ -12,7 +12,7 @@ export const App: Component = () => {
       <SessionProvider>
         <Routes>
           <Route path="/game" component={AuthGuard}>
-            <Route path="/:id" component={Game} />
+            <Route path="/:id" component={Game} data={getGameData} />
             <Route path="/" component={Create} />
           </Route>
           <Route path="/game/:id" component={Game} />
