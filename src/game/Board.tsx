@@ -8,11 +8,12 @@ import {
 } from "solid-js";
 import createPanZoom, { type PanZoom } from "panzoom";
 
-import { type State, board } from "./state";
+import { board } from "./state";
 import { Token } from "./Token";
+import { type Game } from "../api";
 
 export const Board: Component<{
-  tokens: State["tokens"];
+  tokens: Game["tokens"];
   active: boolean;
   onPlaceToken: (tokenId: number) => void;
 }> = (props) => {

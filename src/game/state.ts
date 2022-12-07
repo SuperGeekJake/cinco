@@ -1,21 +1,6 @@
-import { createEffect } from "solid-js";
-import { createStore, produce } from "solid-js/store";
+import { produce } from "immer";
 
-export type PlayerID = string;
-export type TokenID = number;
-export type Tokens = Record<TokenID, number>;
-export type Captures = Record<PlayerID, number>;
-export type PlayOrder = PlayerID[];
-export type Status = "PRE" | "LIVE" | "POST";
-
-export interface State {
-  captures: Captures;
-  currentPlayer: number;
-  gameover: null | { draw: true } | { winner: PlayerID } | { quit: PlayerID };
-  playOrder: PlayOrder;
-  status: Status;
-  tokens: Tokens;
-}
+import { type Game } from "../api";
 
 export const MAX_TOKENS = 19 ** 2;
 
@@ -24,106 +9,89 @@ export const VICTORY_COUNT = 5;
 
 export const DIRECTIONS = [-20, -19, -18, -1] as const;
 
-export const INIT_STATE: State = {
-  captures: {},
-  currentPlayer: 0,
-  gameover: null,
-  playOrder: [],
-  status: "PRE",
-  tokens: {},
-};
-
 export const board = Array.from({ length: MAX_TOKENS }, (_, i) => i);
 
-export const createGame = (initState: State = INIT_STATE) => {
-  const [state, setState] = createStore(initState);
-  createEffect(() => console.log(JSON.stringify(state, null, 2)));
-  return {
-    state,
-    playerJoined: (newPlayer: PlayerID) =>
-      setState(
-        produce<State>((s) => {
-          s.playOrder.push(newPlayer);
-        })
-      ),
-    playerQuit: (leftPlayer: PlayerID) =>
-      setState(
-        produce<State>((s) => {
-          if (s.status === "PRE") {
-            const index = s.playOrder.indexOf(leftPlayer);
-            s.playOrder.splice(index, 1);
-          }
+export const playerJoined = (
+  baseState: Game,
+  playerId: string,
+  displayname: string
+) =>
+  produce<Game>(baseState, (draft) => {
+    draft.playOrder.push(playerId);
+    draft.players[playerId] = displayname;
+  });
 
-          // End game if a player quit during play
-          if (s.status === "LIVE") {
-            s.status = "POST";
-            s.gameover = { quit: leftPlayer };
-          }
-        })
-      ),
-    startedGame: () =>
-      setState(
-        produce<State>((s) => {
-          s.status = "LIVE";
-          s.captures = s.playOrder.reduce((result, playerID) => {
-            result[playerID] = 0;
-            return result;
-          }, {});
-        })
-      ),
-    tokenPlaced: (tokenID: TokenID) =>
-      setState(
-        produce<State>((s) => {
-          const playerID = s.playOrder[s.currentPlayer];
-          s.tokens[tokenID] = s.currentPlayer;
-          s.currentPlayer = (s.currentPlayer + 1) % s.playOrder.length;
+export const playerQuit = (baseState: Game, leftPlayer: string) =>
+  produce<Game>(baseState, (draft) => {
+    if (draft.status === "PRE") {
+      const index = draft.playOrder.indexOf(leftPlayer);
+      draft.playOrder.splice(index, 1);
+    }
 
-          // Update number of captures
-          getCaptures(s.tokens, s.currentPlayer, tokenID).forEach(
-            ([tokenID1, tokenID2]) => {
-              s.captures[playerID] += 1;
-              delete s.tokens[tokenID1];
-              delete s.tokens[tokenID2];
-            }
-          );
+    // End game if a player quit during play
+    if (draft.status === "LIVE") {
+      draft.status = "POST";
+      draft.gameover = { quit: leftPlayer };
+    }
+  });
 
-          // End game if token caused victory
-          if (
-            s.captures[playerID] >= VICTORY_COUNT ||
-            hasRowVictory(s.tokens, s.currentPlayer, tokenID)
-          ) {
-            s.status = "POST";
-            s.gameover = { winner: playerID };
-          }
+export const startedGame = (baseState: Game) =>
+  produce<Game>(baseState, (draft) => {
+    draft.status = "LIVE";
+    draft.captures = draft.playOrder.reduce((result, playerId) => {
+      result[playerId] = 0;
+      return result;
+    }, {});
+  });
 
-          // End game if all positions are taken
-          if (Object.keys(s.tokens).length >= MAX_TOKENS) {
-            s.status = "POST";
-            s.gameover = { draw: true };
-          }
-        })
-      ),
-    resettedGame: () =>
-      setState(
-        produce<State>((s) => {
-          s.captures = {};
-          s.currentPlayer = 0;
-          s.gameover = null;
-          s.status = "LIVE";
-          s.tokens = {};
-        })
-      ),
-  };
-};
+export const tokenPlaced = (baseState: Game, tokenID: number) =>
+  produce<Game>(baseState, (draft) => {
+    const playerId = draft.playOrder[draft.currentPlayer];
+    draft.tokens[tokenID] = draft.currentPlayer;
+    draft.currentPlayer = (draft.currentPlayer + 1) % draft.playOrder.length;
+
+    // Update number of captures
+    getCaptures(draft.tokens, draft.currentPlayer, tokenID).forEach(
+      ([tokenID1, tokenID2]) => {
+        draft.captures[playerId] += 1;
+        delete draft.tokens[tokenID1];
+        delete draft.tokens[tokenID2];
+      }
+    );
+
+    // End game if token caused victory
+    if (
+      draft.captures[playerId] >= VICTORY_COUNT ||
+      hasRowVictory(draft.tokens, draft.currentPlayer, tokenID)
+    ) {
+      draft.status = "POST";
+      draft.gameover = { winner: playerId };
+    }
+
+    // End game if all positions are taken
+    if (Object.keys(draft.tokens).length >= MAX_TOKENS) {
+      draft.status = "POST";
+      draft.gameover = { draw: true };
+    }
+  });
+
+export const resettedGame = (baseState: Game) =>
+  produce<Game>((draft) => {
+    draft.captures = {};
+    draft.currentPlayer = 0;
+    draft.gameover = null;
+    draft.status = "LIVE";
+    draft.tokens = {};
+  });
 
 const getAdjancentTokenID = (
-  tokenID: TokenID,
+  tokenID: number,
   direction: number,
   position: number
 ) => tokenID + DIRECTIONS[direction] * position;
 
 const getAdjancentToken =
-  (board: Tokens, tokenID: TokenID) =>
+  (board: Game["tokens"], tokenID: number) =>
   (direction: number) =>
   (position: number) =>
     board[getAdjancentTokenID(tokenID, direction, position)];
@@ -145,7 +113,7 @@ const getIsRow =
 
 const getHasRow =
   (rowCount: number) =>
-  (board: Tokens, playerOrderId: number, tokenID: TokenID) => {
+  (board: Game["tokens"], playerOrderId: number, tokenID: number) => {
     const maxRowIndex = rowCount - 1;
     const minRowIndex = -maxRowIndex;
     const isRow = getIsRow(rowCount, minRowIndex, maxRowIndex);
@@ -176,9 +144,9 @@ const isCapture = (
   getter(3 * rowDirection) === playerOrderId;
 
 const getCaptures = (
-  board: Tokens,
+  board: Game["tokens"],
   playerOrderId: number,
-  tokenID: TokenID
+  tokenID: number
 ) => {
   const captures: [number, number][] = [];
   const getTokenForDirection = getAdjancentToken(board, tokenID);

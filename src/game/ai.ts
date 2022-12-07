@@ -1,10 +1,11 @@
 import { createMemo, createEffect, onCleanup } from "solid-js";
 
-import { type TokenID, type State, board } from "./state";
+import { board } from "./state";
+import { type Game } from "../api";
 
 export const createAi = (
-  state: State,
-  tokenPlaced: (tokenId: TokenID) => void
+  state: Game,
+  tokenPlaced: (tokenId: number) => void
 ) => {
   const getPossibleMoves = createMemo(() => {
     const currentBoard = board.slice();

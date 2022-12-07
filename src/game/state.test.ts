@@ -1,31 +1,34 @@
-import { describe, test, expect } from "vitest";
+import { createStore } from "solid-js/store";
 
-describe("createGame", () => {
-  test("returns the default state if none is provided", () => {
-    const results = createGame();
-    expect(results.state).toEqual(INIT_STATE);
-  });
+import { type Game } from "../api";
+import { playerJoined } from "./state";
 
-  test("returns the initial state provided", () => {
-    const state = {
-      ...INIT_STATE,
-      playOrder: ["__CPU_PLAYER_01__"],
-    };
-    const results = createGame(state);
-    expect(results.state).toEqual(state);
-  });
+const INIT_STATE: Game = {
+  captures: null,
+  currentPlayer: null,
+  gameover: null,
+  id: "144ae1e3-d8c9-4a78-ac0a-f917492b916e",
+  playOrder: ["cfaed77a-d0a5-460f-be48-ad4408a42809"],
+  players: { "cfaed77a-d0a5-460f-be48-ad4408a42809": "Yake" },
+  status: "PRE",
+  tokens: null,
+};
 
+describe("Game state logic", () => {
   describe("playerJoined", () => {
     test("successfully adds player to game", () => {
-      const state = {
+      const results = playerJoined(
+        INIT_STATE,
+        "__CPU_PLAYER_02__",
+        "CPU Player 2"
+      );
+      expect(results).toEqual({
         ...INIT_STATE,
-        playOrder: ["__CPU_PLAYER_01__"],
-      };
-      const results = createGame(state);
-      results.playerJoined("__CPU_PLAYER_02__");
-      expect(results.state).toEqual({
-        ...INIT_STATE,
-        playOrder: ["__CPU_PLAYER_01__", "__CPU_PLAYER_02__"],
+        playOrder: [...INIT_STATE.playOrder, "__CPU_PLAYER_02__"],
+        players: {
+          ...INIT_STATE.players,
+          ["__CPU_PLAYER_02__"]: "CPU Player 2",
+        },
       });
     });
   });

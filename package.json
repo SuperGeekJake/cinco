@@ -27,6 +27,7 @@
   "dependencies": {
     "@solidjs/router": "^0.5.0",
     "@supabase/supabase-js": "^2.0.6",
+    "immer": "^9.0.16",
     "panzoom": "^9.4.3",
     "solid-js": "^1.6.1",
     "uuid": "^9.0.0"

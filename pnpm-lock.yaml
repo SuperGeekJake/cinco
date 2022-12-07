@@ -7,6 +7,7 @@ specifiers:
   '@testing-library/jest-dom': ^5.16.5
   '@types/testing-library__jest-dom': ^5.14.5
   autoprefixer: ^10.4.13
+  immer: ^9.0.16
   jsdom: ^20.0.3
   panzoom: ^9.4.3
   postcss: ^8.4.18
@@ -22,6 +23,7 @@ specifiers:
 dependencies:
   '@solidjs/router': 0.5.0_solid-js@1.6.1
   '@supabase/supabase-js': 2.0.6
+  immer: 9.0.16
   panzoom: 9.4.3
   solid-js: 1.6.1
   uuid: 9.0.0
@@ -1603,6 +1605,10 @@ packages:
     dependencies:
       safer-buffer: 2.1.2
     dev: true
+
+  /immer/9.0.16:
+    resolution: {integrity: sha512-qenGE7CstVm1NrHQbMh8YaSzTZTFNP3zPqr3YU0S0UY441j4bJTg4A2Hh5KAhwgaiU6ZZ1Ar6y/2f4TblnMReQ==}
+    dev: false
 
   /indent-string/4.0.0:
     resolution: {integrity: sha512-EdDDZu4A2OyIK7Lr/2zG+w5jmbuk1DVBnEwREQvBzspBJkCEbRa8GxU1lghYcaGJCnRWibjDXlq779X1/y5xwg==}
