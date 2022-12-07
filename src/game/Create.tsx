@@ -27,7 +27,7 @@ export const Create: Component = () => {
       .abortSignal(abortController.signal);
 
     if (error) throw error;
-    navigate(`/game/${gameId}`);
+    navigate(`/game/${gameId}`, { replace: true });
   });
 
   onCleanup(() => {
