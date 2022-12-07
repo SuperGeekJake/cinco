@@ -1,5 +1,3 @@
-import { createStore } from "solid-js/store";
-
 import { type Game } from "../api";
 import { playerJoined } from "./state";
 
