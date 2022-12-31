@@ -1,6 +1,6 @@
 import { onCleanup, createResource } from "solid-js";
 import { type RealtimeChannel } from "@supabase/supabase-js";
-import { type Tables, type Table, supabase } from "./api";
+import { supabase } from "./api";
 
 interface Props<TableName extends Table> {
   table: TableName;

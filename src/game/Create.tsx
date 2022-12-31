@@ -8,30 +8,16 @@ import { useSession } from "../session";
 
 export const Create: Component = () => {
   const navigate = useNavigate();
-  const session = useSession();
-  const abortController = new AbortController();
 
   onMount(async () => {
-    const gameId = uuidv4();
-    const {
-      id: playerId,
-      user_metadata: { displayname },
-    } = session().user;
-    const { error } = await supabase
-      .from("games")
-      .insert({
-        id: gameId,
-        playOrder: [playerId],
-        players: { [playerId]: displayname },
-      })
-      .abortSignal(abortController.signal);
+    const { data, error } = await supabase.functions.invoke("game-action", {
+      body: {
+        type: "CREATE",
+      },
+    });
 
     if (error) throw error;
-    navigate(`/game/${gameId}`, { replace: true });
-  });
-
-  onCleanup(() => {
-    abortController.abort();
+    navigate(`/game/${data.gameId}`, { replace: true });
   });
 
   return <Loading />;

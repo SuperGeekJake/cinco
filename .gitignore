@@ -1,3 +1,8 @@
+.env*
+# Supabase
+.branches
+.temp
+# node
 node_modules
+# vite
 dist
-.env

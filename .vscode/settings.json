@@ -1,3 +1,6 @@
 {
-  "jest.jestCommandLine": "pnpm jest"
+  "deno.enable": true,
+  "deno.enablePaths": [
+    "supabase/functions"
+  ]
 }

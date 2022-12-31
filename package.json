@@ -1,7 +1,7 @@
 {
-  "name": "vite-template-solid",
-  "version": "0.0.0",
-  "description": "",
+  "name": "cinco",
+  "version": "0.1.0",
+  "description": "An abstract strategy game based on Go for 2-4 players",
   "scripts": {
     "start": "vite",
     "dev": "vite",
@@ -9,7 +9,6 @@
     "serve": "vite preview",
     "test": "vitest"
   },
-  "license": "MIT",
   "devDependencies": {
     "@solidjs/testing-library": "^0.5.1",
     "@testing-library/jest-dom": "^5.16.5",
