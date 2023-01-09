@@ -130,6 +130,10 @@ const getUser = async (req: Request) => {
 
 serve(async (req: Request) => {
   try {
+    // Handle CORS preflight requests
+    if (req.method === "OPTIONS")
+      return StandardResponse(null, { status: 204 });
+
     if (req.method !== "POST")
       throw new RequestError("Endpoint only accepts POST method", 405);
 
