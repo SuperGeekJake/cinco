@@ -1,9 +1,10 @@
-import { serve } from "https://deno.land/std@0.131.0/http/server.ts";
+import { serve } from "https://deno.land/std@0.170.0/http/server.ts";
+
 import {
   createClient,
   SupabaseClient,
   User,
-} from "https://esm.sh/@supabase/supabase-js@2.1.3";
+} from "https://esm.sh/@supabase/supabase-js@2.2.3";
 
 interface CreateAction {
   type: "CREATE";
@@ -58,6 +59,9 @@ const StandardResponse = (
 ) => {
   return new Response(JSON.stringify(data), {
     headers: {
+      "Access-Control-Allow-Origin": "*",
+      "Access-Control-Allow-Headers":
+        "authorization, x-client-info, apikey, content-type",
       "Content-Type": "application/json",
       ...options.headers,
     },
@@ -65,7 +69,17 @@ const StandardResponse = (
   });
 };
 
+const InvalidResponse = (
+  message: string,
+  options: { status?: number; headers?: Record<string, string> } = {}
+) => {
+  return StandardResponse(message, { ...options, status: 400 });
+};
+
 const actionHandlers = {
+  UNKNOWN: async () => {
+    return await InvalidResponse("Invalid game action provided");
+  },
   CREATE: async (supabase: SupabaseClient, user: User) => {
     const {
       id: playerId,
@@ -116,13 +130,23 @@ const getUser = async (req: Request) => {
 
 serve(async (req: Request) => {
   try {
-    const action = (await req.json()) as GameAction;
+    if (req.method !== "POST")
+      throw new RequestError("Endpoint only accepts POST method", 405);
+
+    const action = await req.json();
+    const type: keyof typeof actionHandlers =
+      typeof action === "object" &&
+      typeof action.type === "string" &&
+      actionHandlers[action.type as keyof typeof actionHandlers]
+        ? action.type
+        : "UNKNOWN";
     const user = await getUser(req);
     const supabase = createClient(
       Deno.env.get("SUPABASE_URL") ?? "",
       Deno.env.get("SUPABASE_SERVICE_ROLE_KEY") ?? ""
     );
-    return actionHandlers[action.type](supabase, user);
+    const response = await actionHandlers[type](supabase, user);
+    return response;
   } catch (error) {
     return StandardResponse(error.message, { status: error.status ?? 500 });
   }
