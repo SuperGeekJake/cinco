@@ -4,6 +4,9 @@
   "description": "An abstract strategy game based on Go for 2-4 players",
   "scripts": {
     "start": "vite",
+    "start:local": "NODE_ENV=local vite",
+    "start:server": "supabase start",
+    "stop:server": "supabase stop",
     "dev": "vite",
     "build": "vite build",
     "serve": "vite preview",
@@ -17,6 +20,7 @@
     "jsdom": "^20.0.3",
     "postcss": "^8.4.18",
     "prettier": "^2.7.1",
+    "supabase": "^1.27.10",
     "tailwindcss": "^3.2.2",
     "typescript": "^4.8.4",
     "vite": "^3.2.3",
